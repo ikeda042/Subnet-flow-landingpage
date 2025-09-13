@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数理生命研究室 - 生命現象を力学から解き明かす</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #fff;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header */
+        header {
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        .nav-links a {
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: #666;
+        }
+        
+        .language-switch {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .language-switch a {
+            color: #666;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        
+        .language-switch a.active {
+            color: #333;
+            font-weight: bold;
+        }
+        
+        /* Hero Section */
+        .hero {
+            position: relative;
+            padding: 120px 0 80px;
+            text-align: center;
+            overflow: hidden; /* ぼかしのはみ出しを隠す */
+        }
+        .hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: url('/toppage3.png') center/cover no-repeat;
+            filter: blur(20px);
+            transform: scale(1.05); /* ぼかしで端が透けないよう拡大 */
+            z-index: 0;
+        }
+        .hero > .container {
+            position: relative;
+            z-index: 1; /* テキストはぼかしの上に表示 */
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 300;
+            margin-bottom: 1rem;
+            color: #333;
+            letter-spacing: 0.05em;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            color: #666;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            line-height: 1.8;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: 2px solid #333;
+            background: transparent;
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            border-radius: 0;
+        }
+        
+        .btn:hover {
+            background: #333;
+            color: #fff;
+        }
+        
+        .btn-primary {
+            background: #333;
+            color: #fff;
+        }
+        
+        .btn-primary:hover {
+            background: transparent;
+            color: #333;
+        }
+        
+        /* Section Styles */
+        section {
+            padding: 80px 0;
+        }
+        
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 300;
+            text-align: center;
+            margin-bottom: 3rem;
+            color: #333;
+        }
+        
+        /* Research Themes */
+        .research-filters {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .filter-btn {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            background: transparent;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 0;
+        }
+        
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: #f5f5f5;
+            color: #333;
+        }
+        
+        .research-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .research-card {
+            border: 1px solid #ddd;
+            padding: 2rem;
+            background: #fff;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .research-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .research-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .research-card p {
+            color: #666;
+            line-height: 1.7;
+        }
+        
+        /* Members */
+        .members-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        
+        .member-card {
+            text-align: center;
+            padding: 2rem;
+            border: 1px solid #eee;
+            background: #fafafa;
+        }
+        
+        .member-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: #ddd;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: #999;
+        }
+        
+        .member-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+        
+        .member-card p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        /* Publications */
+        .publications-list {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .publication-item {
+            padding: 1.5rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .publication-item:last-child {
+            border-bottom: none;
+        }
+        
+        .publication-item h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+        
+        .publication-item p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        /* Contact */
+        .contact {
+            background: #f8f8f8;
+        }
+        
+        .contact-content {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .contact-info {
+            margin: 2rem 0;
+        }
+        
+        .contact-info p {
+            margin-bottom: 1rem;
+            color: #666;
+        }
+        
+        .copy-btn {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+        }
+        
+        .copy-btn:hover {
+            color: #333;
+        }
+        
+        /* Footer */
+        footer {
+            background: #333;
+            color: #fff;
+            text-align: center;
+            padding: 2rem 0;
+        }
+        
+        footer p {
+            margin-bottom: 0.5rem;
+        }
+        
+        .footer-tech {
+            font-size: 0.8rem;
+            color: #999;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .research-filters {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <a href="#top" class="logo">数理生命研究室</a>
+            <ul class="nav-links">
+                <li><a href="#top">Top</a></li>
+                <li><a href="#research">研究テーマ</a></li>
+                <li><a href="#members">メンバー</a></li>
+                <li><a href="#publications">実績</a></li>
+                <li><a href="#contact">連絡先</a></li>
+            </ul>
+            <div class="language-switch">
+                <a href="#" class="active">日本語</a>
+                <span>/</span>
+                <a href="#">EN</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="top" class="hero">
+            <div class="container">
+                <h1>生命現象を力学から解き明かす</h1>
+                <p>実験と数理の往復から生体の仕組みを探ります。</p>
+                <div class="hero-buttons">
+                    <a href="#research" class="btn btn-primary">研究テーマを見る</a>
+                    <a href="#contact" class="btn">連絡する</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="research" class="research">
+            <div class="container">
+                <h2 class="section-title">研究テーマ</h2>
+
+                <div class="research-grid">
+                    <div class="research-card">
+                        <h3>計算モデリング</h3>
+                        <p>有限要素法や機械学習を用いた多階層モデル化。生体組織の力学的特性を数値シミュレーションで解析し、実験データとの比較検証を通じて生命現象の本質に迫ります。</p>
+                    </div>
+                    <div class="research-card">
+                        <h3>生体力学実験</h3>
+                        <p>細胞から組織レベルまでの力学的特性測定。マイクロ・ナノスケールでの力学実験技術を駆使し、生体材料の階層構造と機能の関係を実験的に解明します。</p>
+                    </div>
+                    <div class="research-card">
+                        <h3>バイオマテリアル開発</h3>
+                        <p>生体適合性材料の設計と評価。天然の生体組織の構造と機能を模倣した新規材料の開発を通じて、再生医療への応用を目指します。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="members" class="members">
+            <div class="container">
+                <h2 class="section-title">メンバー</h2>
+                <div class="members-grid">
+                    <div class="member-card">
+                        <div class="member-avatar">👨‍🔬</div>
+                        <h3>山田 太郎</h3>
+                        <p>教授 / PI</p>
+                    </div>
+                    <div class="member-card">
+                        <div class="member-avatar">👩‍🔬</div>
+                        <h3>佐藤 花子</h3>
+                        <p>助教</p>
+                    </div>
+                    <div class="member-card">
+                        <div class="member-avatar">👨‍🎓</div>
+                        <h3>John Smith</h3>
+                        <p>Ph.D. Candidate</p>
+                    </div>
+                    <div class="member-card">
+                        <div class="member-avatar">👨‍🎓</div>
+                        <h3>王 小明</h3>
+                        <p>M2</p>
+                    </div>
+                </div>
+                <p style="text-align: center; color: #666; margin-top: 2rem; font-size: 0.9rem;">
+                    ※学年・所属は一部抜粋・例示
+                </p>
+            </div>
+        </section>
+
+        <section id="publications" class="publications">
+            <div class="container">
+                <h2 class="section-title">実績</h2>
+                <div class="publications-list">
+                    <div class="publication-item">
+                        <h4>Mechanical Properties of Biological Tissues: A Computational Approach</h4>
+                        <p>Journal of Biomechanics, 2024</p>
+                    </div>
+                    <div class="publication-item">
+                        <h4>Multi-scale Modeling of Cell-Matrix Interactions</h4>
+                        <p>Nature Biomedical Engineering, 2023</p>
+                    </div>
+                    <div class="publication-item">
+                        <h4>Novel Biomaterials for Tissue Engineering Applications</h4>
+                        <p>Advanced Materials, 2023</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="contact">
+            <div class="container">
+                <h2 class="section-title">連絡先</h2>
+                <div class="contact-content">
+                    <p>共同研究・配属希望はメールでお問い合わせください。見学も歓迎します。</p>
+                    <div class="contact-info">
+                        <p>〒000-0000 東京都千代田区1-1-1</p>
+                        <p>メール: info@lab.example
+                            <button class="copy-btn" onclick="copyToClipboard('info@lab.example')">コピー</button>
+                        </p>
+                        <p>電話: 03-0000-0000
+                            <button class="copy-btn" onclick="copyToClipboard('03-0000-0000')">コピー</button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; <span id="current-year"></span>数理生命研究室</p>
+        </div>
+    </footer>
+
+    <script>
+    // Set current year in footer
+    document.getElementById('current-year').textContent = new Date().getFullYear();
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Research filter functionality
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                // In a real implementation, you would filter the research cards here
+                // For now, we'll just show all cards
+            });
+        });
+
+        // Copy to clipboard functionality
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                // Could add a toast notification here
+                console.log('Copied to clipboard: ' + text);
+            }).catch(function(err) {
+                console.error('Could not copy text: ', err);
+            });
+        }
+
+        // Header background change on scroll
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('header');
+            if (window.scrollY > 100) {
+                header.style.background = 'rgba(255, 255, 255, 0.95)';
+                header.style.backdropFilter = 'blur(10px)';
+            } else {
+                header.style.background = '#fff';
+                header.style.backdropFilter = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

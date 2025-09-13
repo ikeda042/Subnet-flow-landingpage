@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BioGenesis Lab - 生命科学の最前線</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #2563eb;
+            --secondary: #06b6d4;
+            --accent: #10b981;
+            --warm-accent: #f59e0b;
+            --light-bg: #fefefe;
+            --section-bg: #f8fafc;
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --glass: rgba(255, 255, 255, 0.25);
+            --glass-border: rgba(148, 163, 184, 0.2);
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --gradient-primary: linear-gradient(135deg, #2563eb, #06b6d4);
+            --gradient-accent: linear-gradient(135deg, #10b981, #059669);
+            --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-large: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--light-bg);
+            color: var(--text-primary);
+            line-height: 1.7;
+            overflow-x: hidden;
+            font-weight: 400;
+            letter-spacing: -0.025em;
+        }
+        
+        /* Subtle Background Pattern */
+        .dna-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.03;
+            background-image: 
+                radial-gradient(circle at 25% 25%, #2563eb 1px, transparent 1px),
+                radial-gradient(circle at 75% 75%, #06b6d4 1px, transparent 1px);
+            background-size: 80px 80px;
+            animation: backgroundDrift 20s ease-in-out infinite;
+        }
+        
+        @keyframes backgroundDrift {
+            0%, 100% { transform: translateX(0) translateY(0); }
+            25% { transform: translateX(20px) translateY(-20px); }
+            50% { transform: translateX(-20px) translateY(20px); }
+            75% { transform: translateX(20px) translateY(20px); }
+        }
+        
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            backdrop-filter: blur(20px) saturate(180%);
+            background: rgba(248, 250, 252, 0.8);
+            border-bottom: 1px solid var(--glass-border);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.2rem 2rem;
+        }
+        
+        .logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.8rem;
+            font-weight: 600;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.05em;
+        }
+        
+        .nav-controls {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+        
+        .lang-toggle {
+            display: flex;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 0.3rem;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-soft);
+        }
+        
+        .lang-btn {
+            padding: 0.6rem 1.2rem;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .lang-btn.active {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 5px;
+        }
+        
+        .hamburger span {
+            width: 28px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+        
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 90px;
+            right: 2rem;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 24px;
+            border: 1px solid var(--glass-border);
+            padding: 1.2rem;
+            z-index: 999;
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            list-style: none;
+        }
+        
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.9rem 1.6rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        
+        .nav-item a:hover {
+            background: var(--gradient-primary);
+            color: white;
+            transform: translateX(6px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+        }
+        
+        /* Main Content */
+        main {
+            padding-top: 90px;
+        }
+        
+        .section {
+            min-height: 100vh;
+            padding: 5rem 2rem;
+            position: relative;
+        }
+        
+        .section:nth-child(even) {
+            background: var(--section-bg);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* Hero Section */
+        .hero {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.03), rgba(6, 182, 212, 0.03));
+        }
+        
+        .hero-content h1 {
+            font-size: clamp(3.5rem, 8vw, 7rem);
+            font-weight: 800;
+            margin-bottom: 2rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.1;
+            letter-spacing: -0.05em;
+            animation: titleGlow 4s ease-in-out infinite alternate;
+        }
+        
+        @keyframes titleGlow {
+            0% { filter: brightness(1); }
+            100% { filter: brightness(1.1) drop-shadow(0 0 30px rgba(37, 99, 235, 0.1)); }
+        }
+        
+        .hero-content p {
+            font-size: 1.4rem;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            max-width: 700px;
+            font-weight: 400;
+            line-height: 1.8;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            padding: 1.2rem 2.5rem;
+            background: var(--gradient-primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
+        }
+        
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.8s ease;
+        }
+        
+        .cta-button:hover::before {
+            left: 100%;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(37, 99, 235, 0.4);
+        }
+        
+        /* Research Themes */
+        .research-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 2.5rem;
+            margin-top: 4rem;
+        }
+        
+        .research-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 28px;
+            padding: 2.5rem;
+            border: 1px solid var(--glass-border);
+            transition: all 0.5s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+        }
+        
+        .research-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: var(--gradient-primary);
+            border-radius: 28px 28px 0 0;
+        }
+        
+        .research-card:nth-child(2)::before {
+            background: var(--gradient-accent);
+        }
+        
+        .research-card:nth-child(3)::before {
+            background: linear-gradient(135deg, var(--warm-accent), #f97316);
+        }
+        
+        .research-card:nth-child(4)::before {
+            background: linear-gradient(135deg, #8b5cf6, #a855f7);
+        }
+        
+        .research-card:hover {
+            transform: translateY(-12px);
+            box-shadow: var(--shadow-large);
+        }
+        
+        .research-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient-primary);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .research-card:nth-child(2) .research-icon {
+            background: var(--gradient-accent);
+        }
+        
+        .research-card:nth-child(3) .research-icon {
+            background: linear-gradient(135deg, var(--warm-accent), #f97316);
+        }
+        
+        .research-card:nth-child(4) .research-icon {
+            background: linear-gradient(135deg, #8b5cf6, #a855f7);
+        }
+        
+        .research-card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            letter-spacing: -0.025em;
+        }
+        
+        .research-card p {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+        
+        .research-details {
+            background: var(--section-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .research-card:nth-child(2) .research-details {
+            border-left-color: var(--accent);
+        }
+        
+        .research-card:nth-child(3) .research-details {
+            border-left-color: var(--warm-accent);
+        }
+        
+        .research-card:nth-child(4) .research-details {
+            border-left-color: #8b5cf6;
+        }
+        
+        .research-details h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+            color: var(--text-primary);
+        }
+        
+        .research-details ul {
+            list-style: none;
+            margin-left: 0;
+        }
+        
+        .research-details li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+        
+        .research-details li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+            font-weight: bold;
+        }
+        
+        /* Members Grid */
+        .members-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2.5rem;
+            margin-top: 4rem;
+        }
+        
+        .member-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 28px;
+            padding: 2.5rem;
+            text-align: center;
+            border: 1px solid var(--glass-border);
+            transition: all 0.5s ease;
+            position: relative;
+            box-shadow: var(--shadow-soft);
+        }
+        
+        .member-card:hover {
+            transform: scale(1.03) translateY(-8px);
+            box-shadow: var(--shadow-large);
+        }
+        
+        .member-avatar {
+            width: 140px;
+            height: 140px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            margin: 0 auto 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .member-card:nth-child(2) .member-avatar {
+            background: var(--gradient-accent);
+        }
+        
+        .member-card:nth-child(3) .member-avatar {
+            background: linear-gradient(135deg, var(--warm-accent), #f97316);
+        }
+        
+        .member-card:nth-child(4) .member-avatar {
+            background: linear-gradient(135deg, #8b5cf6, #a855f7);
+        }
+        
+        .member-card h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+        
+        .member-role {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+        
+        .member-specialty {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            line-height: 1.7;
+        }
+        
+        /* Publications */
+        .publication-item {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            border-left: 5px solid var(--primary);
+            transition: all 0.4s ease;
+            box-shadow: var(--shadow-soft);
+        }
+        
+        .publication-item:nth-child(2) {
+            border-left-color: var(--accent);
+        }
+        
+        .publication-item:nth-child(3) {
+            border-left-color: var(--warm-accent);
+        }
+        
+        .publication-item:hover {
+            transform: translateX(12px);
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .publication-item h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            color: var(--text-primary);
+        }
+        
+        .publication-journal {
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .publication-item:nth-child(2) .publication-journal {
+            color: var(--accent);
+        }
+        
+        .publication-item:nth-child(3) .publication-journal {
+            color: var(--warm-accent);
+        }
+        
+        .publication-description {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+        
+        .publication-impact {
+            background: var(--section-bg);
+            padding: 1.2rem;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            border-left: 3px solid var(--primary);
+        }
+        
+        .publication-item:nth-child(2) .publication-impact {
+            border-left-color: var(--accent);
+        }
+        
+        .publication-item:nth-child(3) .publication-impact {
+            border-left-color: var(--warm-accent);
+        }
+        
+        /* Contact */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2.5rem;
+            margin-top: 4rem;
+        }
+        
+        .contact-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 28px;
+            padding: 2.5rem;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-soft);
+            transition: all 0.4s ease;
+        }
+        
+        .contact-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .contact-icon {
+            width: 70px;
+            height: 70px;
+            background: var(--gradient-accent);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            box-shadow: var(--shadow-soft);
+        }
+        
+        .contact-card:nth-child(2) .contact-icon {
+            background: var(--gradient-primary);
+        }
+        
+        .contact-card:nth-child(3) .contact-icon {
+            background: linear-gradient(135deg, var(--warm-accent), #f97316);
+        }
+        
+        .contact-card h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        
+        .contact-card p {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            line-height: 1.8;
+        }
+        
+        /* Section Titles */
+        .section-title {
+            font-size: clamp(2.8rem, 5vw, 4.5rem);
+            text-align: center;
+            margin-bottom: 4rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+            letter-spacing: -0.05em;
+            line-height: 1.2;
+        }
+        
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            margin-top: -2rem;
+            margin-bottom: 3rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.8;
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--text-primary);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+            border-top: 1px solid var(--glass-border);
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .footer-content p {
+            margin-bottom: 1rem;
+            opacity: 0.9;
+        }
+        
+        .footer-logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            .hamburger {
+                display: flex;
+            }
+            
+            nav {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 100%;
+                height: 100vh;
+                background: var(--light-bg);
+                padding: 7rem 2rem 2rem;
+                transition: right 0.4s ease;
+                box-shadow: none;
+                border-radius: 0;
+            }
+            
+            nav.active {
+                right: 0;
+            }
+            
+            .nav-menu {
+                gap: 1.5rem;
+            }
+            
+            .nav-item a {
+                padding: 1.2rem 2rem;
+                font-size: 1.3rem;
+                background: var(--card-bg);
+                border-radius: 20px;
+                box-shadow: var(--shadow-soft);
+            }
+            
+            .research-grid,
+            .members-grid,
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .section {
+                padding: 3rem 1.5rem;
+            }
+        }
+        
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Utilities */
+        .hidden { display: none; }
+        .visible { display: block; }
+    </style>
+</head>
+<body>
+    <div class="dna-background"></div>
+    
+    <header>
+        <div class="header-content">
+            <div class="logo">BioGenesis Lab</div>
+            <div class="nav-controls">
+                <div class="lang-toggle">
+                    <button class="lang-btn active" onclick="switchLang('ja')">JA</button>
+                    <button class="lang-btn" onclick="switchLang('en')">EN</button>
+                </div>
+                <div class="hamburger" onclick="toggleMobileMenu()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <nav id="nav">
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="#home" onclick="closeMenu()">🏠 <span data-ja="トップ" data-en="Home">トップ</span></a></li>
+            <li class="nav-item"><a href="#research" onclick="closeMenu()">🔬 <span data-ja="研究テーマ" data-en="Research">研究テーマ</span></a></li>
+            <li class="nav-item"><a href="#members" onclick="closeMenu()">👥 <span data-ja="メンバー" data-en="Members">メンバー</span></a></li>
+            <li class="nav-item"><a href="#publications" onclick="closeMenu()">📚 <span data-ja="実績" data-en="Publications">実績</span></a></li>
+            <li class="nav-item"><a href="#contact" onclick="closeMenu()">📧 <span data-ja="連絡先" data-en="Contact">連絡先</span></a></li>
+        </ul>
+    </nav>
+    
+    <main>
+        <section id="home" class="section hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h1 data-ja="生命科学の最前線" data-en="Frontiers of Life Science">生命科学の最前線</h1>
+                    <p data-ja="私たちBioGenesis Labは、最先端の生物学技術と革新的なアプローチを通じて、生命の根本的なメカニズムを解明し、人類の健康と幸福に貢献する画期的な発見を追求しています。遺伝子工学から合成生物学まで、多様な分野における学際的研究により、未来の医療と生命科学技術の発展を牽引します。" data-en="At BioGenesis Lab, we pursue groundbreaking discoveries that contribute to human health and well-being by elucidating fundamental mechanisms of life through cutting-edge biological technologies and innovative approaches. Through interdisciplinary research spanning from genetic engineering to synthetic biology, we lead the development of future medicine and life science technologies.">私たちBioGenesis Labは、最先端の生物学技術と革新的なアプローチを通じて、生命の根本的なメカニズムを解明し、人類の健康と幸福に貢献する画期的な発見を追求しています。遺伝子工学から合成生物学まで、多様な分野における学際的研究により、未来の医療と生命科学技術の発展を牽引します。</p>
+                    <a href="#research" class="cta-button" data-ja="研究を探索する" data-en="Explore Research">研究を探索する</a>
+                </div>
+            </div>
+        </section>
+        
+        <section id="research" class="section">
+            <div class="container">
+                <h2 class="section-title" data-ja="研究テーマ" data-en="Research Themes">研究テーマ</h2>
+                <p class="section-subtitle" data-ja="私たちは4つの主要分野において、生命科学の新たな地平を切り開く革新的研究を展開しています。" data-en="We conduct innovative research that opens new horizons in life sciences across four major fields.">私たちは4つの主要分野において、生命科学の新たな地平を切り開く革新的研究を展開しています。</p>
+                <div class="research-grid">
+                    <div class="research-card">
+                        <div class="research-icon">🧬</div>
+                        <h3 data-ja="遺伝子工学・ゲノム編集" data-en="Genetic Engineering & Genome Editing">遺伝子工学・ゲノム編集</h3>
+                        <p data-ja="次世代CRISPR技術の開発と応用により、より精密で安全な遺伝子編集システムを構築しています。特に、オフターゲット効果を最小限に抑えた革新的なCas酵素の設計と、エピゲノム編集技術の開発に焦点を当てています。" data-en="We develop and apply next-generation CRISPR technology to build more precise and safer gene editing systems. We particularly focus on designing innovative Cas enzymes with minimized off-target effects and developing epigenome editing technologies.">次世代CRISPR技術の開発と応用により、より精密で安全な遺伝子編集システムを構築しています。特に、オフターゲット効果を最小限に抑えた革新的なCas酵素の設計と、エピゲノム編集技術の開発に焦点を当てています。</p>
+                        <div class="research-details">
+                            <h4 data-ja="主要研究プロジェクト" data-en="Key Research Projects">主要研究プロジェクト</h4>
+                            <ul>
+                                <li data-ja="高精度Base Editing技術の開発" data-en="Development of high-precision base editing technology">高精度Base Editing技術の開発</li>
+                                <li data-ja="細胞特異的遺伝子治療ベクターの設計" data-en="Design of cell-specific gene therapy vectors">細胞特異的遺伝子治療ベクターの設計</li>
+                                <li data-ja="植物バイオマス改良のためのゲノム編集" data-en="Genome editing for plant biomass improvement">植物バイオマス改良のためのゲノム編集</li>
+                                <li data-ja="希少疾患治療への応用研究" data-en="Application research for rare disease treatment">希少疾患治療への応用研究</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="research-card">
+                        <div class="research-icon">🦠</div>
+                        <h3 data-ja="細胞生物学・再生医療" data-en="Cell Biology & Regenerative Medicine">細胞生物学・再生医療</h3>
+                        <p data-ja="幹細胞の分化制御メカニズムを分子レベルで解明し、組織再生技術の実用化を目指しています。iPS細胞技術の改良と、オルガノイド培養技術を活用した疾患モデルの構築により、個別化医療の実現に向けた基盤研究を推進しています。" data-en="We elucidate stem cell differentiation control mechanisms at the molecular level, aiming for practical application of tissue regeneration technologies. We promote foundational research toward personalized medicine through improvements in iPS cell technology and construction of disease models using organoid culture techniques.">幹細胞の分化制御メカニズムを分子レベルで解明し、組織再生技術の実用化を目指しています。iPS細胞技術の改良と、オルガノイド培養技術を活用した疾患モデルの構築により、個別化医療の実現に向けた基盤研究を推進しています。</p>
+                        <div class="research-details">
+                            <h4 data-ja="主要研究プロジェクト" data-en="Key Research Projects">主要研究プロジェクト</h4>
+                            <ul>
+                                <li data-ja="神経幹細胞の分化誘導技術の最適化" data-en="Optimization of neural stem cell differentiation induction">神経幹細胞の分化誘導技術の最適化</li>
+                                <li data-ja="心筋細胞オルガノイドによる薬物スクリーニング" data-en="Drug screening using cardiomyocyte organoids">心筋細胞オルガノイドによる薬物スクリーニング</li>
+                                <li data-ja="間葉系幹細胞を用いた骨軟骨再生療法" data-en="Bone and cartilage regeneration therapy using mesenchymal stem cells">間葉系幹細胞を用いた骨軟骨再生療法</li>
+                                <li data-ja="加齢関連疾患の細胞レベル解析" data-en="Cellular-level analysis of age-related diseases">加齢関連疾患の細胞レベル解析</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="research-card">
+                        <div class="research-icon">🧪</div>
+                        <h3 data-ja="バイオインフォマティクス・計算生物学" data-en="Bioinformatics & Computational Biology">バイオインフォマティクス・計算生物学</h3>
+                        <p data-ja="機械学習とディープラーニング技術を駆使して、大規模ゲノムデータから生物学的洞察を抽出しています。マルチオミクス解析により、疾患の分子機構を統合的に理解し、新規創薬標的の同定と個別化治療戦略の開発を行っています。" data-en="We extract biological insights from large-scale genomic data using machine learning and deep learning technologies. Through multi-omics analysis, we comprehensively understand molecular mechanisms of diseases and develop identification of novel drug targets and personalized treatment strategies.">機械学習とディープラーニング技術を駆使して、大規模ゲノムデータから生物学的洞察を抽出しています。マルチオミクス解析により、疾患の分子機構を統合的に理解し、新規創薬標的の同定と個別化治療戦略の開発を行っています。</p>
+                        <div class="research-details">
+                            <h4 data-ja="主要研究プロジェクト" data-en="Key Research Projects">主要研究プロジェクト</h4>
+                            <ul>
+                                <li data-ja="AI駆動型創薬パイプラインの構築" data-en="Construction of AI-driven drug discovery pipeline">AI駆動型創薬パイプラインの構築</li>
+                                <li data-ja="シングルセルRNA-seq解析による疾患機構解明" data-en="Disease mechanism elucidation through single-cell RNA-seq analysis">シングルセルRNA-seq解析による疾患機構解明</li>
+                                <li data-ja="プロテオミクス・メタボロミクス統合解析" data-en="Integrated proteomics and metabolomics analysis">プロテオミクス・メタボロミクス統合解析</li>
+                                <li data-ja="構造生物学的アプローチによる薬物設計" data-en="Drug design through structural biology approaches">構造生物学的アプローチによる薬物設計</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="research-card">
+                        <div class="research-icon">🌱</div>
+                        <h3 data-ja="合成生物学・バイオエンジニアリング" data-en="Synthetic Biology & Bioengineering">合成生物学・バイオエンジニアリング</h3>
+                        <p data-ja="生物システムを工学的に設計・構築することで、新たな生物機能の創出を目指しています。微生物を利用したバイオファクトリーの開発、人工生体材料の合成、環境浄化システムの構築など、持続可能な社会の実現に向けた研究を展開しています。" data-en="We aim to create new biological functions by engineering the design and construction of biological systems. We conduct research toward realizing a sustainable society, including development of biofactories using microorganisms, synthesis of artificial biomaterials, and construction of environmental purification systems.">生物システムを工学的に設計・構築することで、新たな生物機能の創出を目指しています。微生物を利用したバイオファクトリーの開発、人工生体材料の合成、環境浄化システムの構築など、持続可能な社会の実現に向けた研究を展開しています。</p>
+                        <div class="research-details">
+                            <h4 data-ja="主要研究プロジェクト" data-en="Key Research Projects">主要研究プロジェクト</h4>
+                            <ul>
+                                <li data-ja="酵母による医薬品前駆体の大量生産システム" data-en="Mass production system for pharmaceutical precursors using yeast">酵母による医薬品前駆体の大量生産システム</li>
+                                <li data-ja="細菌による重金属除去・回収技術" data-en="Heavy metal removal and recovery technology using bacteria">細菌による重金属除去・回収技術</li>
+                                <li data-ja="バイオプラスチック分解酵素の分子設計" data-en="Molecular design of bioplastic-degrading enzymes">バイオプラスチック分解酵素の分子設計</li>
+                                <li data-ja="人工光合成システムの開発" data-en="Development of artificial photosynthesis systems">人工光合成システムの開発</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="members" class="section">
+            <div class="container">
+                <h2 class="section-title" data-ja="研究メンバー" data-en="Research Members">研究メンバー</h2>
+                <p class="section-subtitle" data-ja="多様な専門分野のエキスパートが集結し、学際的な研究環境で革新的な発見を生み出しています。" data-en="Experts from diverse specialized fields come together to generate innovative discoveries in an interdisciplinary research environment.">多様な専門分野のエキスパートが集結し、学際的な研究環境で革新的な発見を生み出しています。</p>
+                <div class="members-grid">
+                    <div class="member-card">
+                        <div class="member-avatar">👨‍🔬</div>
+                        <h3 data-ja="田中 研一郎" data-en="Dr. Kenichiro Tanaka">田中 研一郎</h3>
+                        <p class="member-role" data-ja="研究室主任・教授" data-en="Principal Investigator / Professor">研究室主任・教授</p>
+                        <p class="member-specialty" data-ja="遺伝子工学・分子生物学の第一人者として、CRISPR技術の開発と応用に20年以上従事。米国ハーバード大学でポスドク研究を行い、Nature誌に15本以上の論文を発表。日本遺伝子工学学会理事、文部科学省科学技術審議会委員を歴任。" data-en="As a leading expert in genetic engineering and molecular biology, has been engaged in CRISPR technology development and application for over 20 years. Conducted postdoc research at Harvard University and published over 15 papers in Nature. Served as director of the Japanese Society of Gene Engineering and member of MEXT Council for Science and Technology.">遺伝子工学・分子生物学の第一人者として、CRISPR技術の開発と応用に20年以上従事。米国ハーバード大学でポスドク研究を行い、Nature誌に15本以上の論文を発表。日本遺伝子工学学会理事、文部科学省科学技術審議会委員を歴任。</p>
+                    </div>
+                    <div class="member-card">
+                        <div class="member-avatar">👩‍🔬</div>
+                        <h3 data-ja="佐藤 美咲" data-en="Dr. Misaki Sato">佐藤 美咲</h3>
+                        <p class="member-role" data-ja="准教授" data-en="Associate Professor">准教授</p>
+                        <p class="member-specialty" data-ja="細胞生物学・再生医療分野の専門家として、幹細胞研究のパイオニア的存在。京都大学iPS細胞研究所での研究経験を活かし、神経疾患治療への応用研究を推進。Cell誌、Science誌をはじめとする国際学術誌に50本以上の論文を発表し、日本再生医療学会奨励賞を受賞。" data-en="As an expert in cell biology and regenerative medicine, she is a pioneer in stem cell research. Leveraging research experience at Kyoto University's CiRA, she promotes application research for neurological disease treatment. Has published over 50 papers in international journals including Cell and Science, and received the Japan Society for Regenerative Medicine Encouragement Award.">細胞生物学・再生医療分野の専門家として、幹細胞研究のパイオニア的存在。京都大学iPS細胞研究所での研究経験を活かし、神経疾患治療への応用研究を推進。Cell誌、Science誌をはじめとする国際学術誌に50本以上の論文を発表し、日本再生医療学会奨励賞を受賞。</p>
+                    </div>
+                    <div class="member-card">
+                        <div class="member-avatar">👨‍💻</div>
+                        <h3 data-ja="山田 大輝" data-en="Dr. Daiki Yamada">山田 大輝</h3>
+                        <p class="member-role" data-ja="博士研究員" data-en="Postdoctoral Researcher">博士研究員</p>
+                        <p class="member-specialty" data-ja="バイオインフォマティクス・計算生物学の専門家として、機械学習とディープラーニングを生命科学に応用する研究を牽引。東京大学情報理工学研究科で博士号を取得後、米国スタンフォード大学で研究員として勤務。ゲノム解析アルゴリズムの開発で複数の国際特許を取得し、Nature Biotechnology誌の編集委員も務める。" data-en="As an expert in bioinformatics and computational biology, he leads research applying machine learning and deep learning to life sciences. After obtaining his PhD from the University of Tokyo Graduate School of Information Science and Technology, he worked as a researcher at Stanford University. Has obtained multiple international patents for genome analysis algorithm development and serves as an editorial board member for Nature Biotechnology.">バイオインフォマティクス・計算生物学の専門家として、機械学習とディープラーニングを生命科学に応用する研究を牽引。東京大学情報理工学研究科で博士号を取得後、米国スタンフォード大学で研究員として勤務。ゲノム解析アルゴリズムの開発で複数の国際特許を取得し、Nature Biotechnology誌の編集委員も務める。</p>
+                    </div>
+                    <div class="member-card">
+                        <div class="member-avatar">👩‍🎓</div>
+                        <h3 data-ja="鈴木 あかり" data-en="Akari Suzuki">鈴木 あかり</h3>
+                        <p class="member-role" data-ja="博士課程学生（D3）" data-en="PhD Student (3rd year)">博士課程学生（D3）</p>
+                        <p class="member-specialty" data-ja="合成生物学・バイオエンジニアリング分野の若手研究者として、微生物を利用したバイオファクトリーの開発に取り組んでいます。学部時代から優秀な成績を収め、日本学術振興会特別研究員DC1に採用。既に筆頭著者として5本の論文を発表し、日本農芸化学会大会で学生発表優秀賞を受賞するなど、将来有望な研究者として注目されています。" data-en="As a young researcher in synthetic biology and bioengineering, she works on developing biofactories using microorganisms. Achieved excellent grades since undergraduate studies and was selected as a JSPS Research Fellow DC1. Has already published 5 papers as first author and received the Student Presentation Excellence Award at the Japan Society for Bioscience, Biotechnology, and Agrochemistry Annual Meeting, gaining attention as a promising future researcher.">合成生物学・バイオエンジニアリング分野の若手研究者として、微生物を利用したバイオファクトリーの開発に取り組んでいます。学部時代から優秀な成績を収め、日本学術振興会特別研究員DC1に採用。既に筆頭著者として5本の論文を発表し、日本農芸化学会大会で学生発表優秀賞を受賞するなど、将来有望な研究者として注目されています。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="publications" class="section">
+            <div class="container">
+                <h2 class="section-title" data-ja="研究実績・論文発表" data-en="Publications & Achievements">研究実績・論文発表</h2>
+                <p class="section-subtitle" data-ja="世界トップレベルの学術誌への論文発表と、社会実装に向けた研究成果をご紹介します。" data-en="We present our research achievements published in world-class academic journals and results toward social implementation.">世界トップレベルの学術誌への論文発表と、社会実装に向けた研究成果をご紹介します。</p>
+                <div class="publication-item">
+                    <h3 data-ja="超高精度CRISPR-Cas技術の開発と遺伝性疾患治療への応用" data-en="Development of Ultra-High Precision CRISPR-Cas Technology and its Application to Hereditary Disease Treatment">超高精度CRISPR-Cas技術の開発と遺伝性疾患治療への応用</h3>
+                    <p class="publication-journal" data-ja="Nature Biotechnology (2024年3月)" data-en="Nature Biotechnology (March 2024)">Nature Biotechnology (2024年3月)</p>
+                    <p class="publication-description" data-ja="従来のCRISPR技術では困難であったオフターゲット効果を99.8%削減する革新的なCas酵素変異体を開発。デュシェンヌ型筋ジストロフィーや嚢胞性線維症などの遺伝性疾患に対する安全で効果的な遺伝子治療法として、臨床応用への道筋を確立しました。" data-en="Developed innovative Cas enzyme variants that reduce off-target effects, previously difficult with conventional CRISPR technology, by 99.8%. Established a pathway to clinical application as a safe and effective gene therapy for hereditary diseases such as Duchenne muscular dystrophy and cystic fibrosis.">従来のCRISPR技術では困難であったオフターゲット効果を99.8%削減する革新的なCas酵素変異体を開発。デュシェンヌ型筋ジストロフィーや嚢胞性線維症などの遺伝性疾患に対する安全で効果的な遺伝子治療法として、臨床応用への道筋を確立しました。</p>
+                    <p class="publication-impact" data-ja="インパクト: 世界15か国の研究機関から共同研究の申し込みを受け、既に3件の国際治験が開始されています。この技術は米国FDA、欧州EMAによる画期的治療薬指定を受けており、2026年の実用化を目指しています。" data-en="Impact: Received collaboration applications from research institutions in 15 countries worldwide, with 3 international clinical trials already initiated. This technology has received breakthrough therapy designation from the US FDA and European EMA, aiming for practical application by 2026.">インパクト: 世界15か国の研究機関から共同研究の申し込みを受け、既に3件の国際治験が開始されています。この技術は米国FDA、欧州EMAによる画期的治療薬指定を受けており、2026年の実用化を目指しています。</p>
+                </div>
+                <div class="publication-item">
+                    <h3 data-ja="幹細胞分化における新規シグナルカスケードの発見とパーキンソン病治療への応用" data-en="Discovery of Novel Signaling Cascades in Stem Cell Differentiation and Application to Parkinson's Disease Treatment">幹細胞分化における新規シグナルカスケードの発見とパーキンソン病治療への応用</h3>
+                    <p class="publication-journal" data-ja="Cell (2023年11月)" data-en="Cell (November 2023)">Cell (2023年11月)</p>
+                    <p class="publication-description" data-ja="神経幹細胞からドパミン産生神経細胞への分化を制御する未知のシグナル経路「NeuroPath-α」を発見。この発見により、パーキンソン病患者由来のiPS細胞から高純度かつ機能的なドパミン神経細胞を効率的に分化誘導することが可能となり、細胞移植治療の実現に大きく前進しました。" data-en="Discovered the unknown signaling pathway 'NeuroPath-α' that controls differentiation from neural stem cells to dopamine-producing neurons. This discovery enabled efficient differentiation induction of high-purity and functional dopamine neurons from iPS cells derived from Parkinson's disease patients, making significant progress toward realizing cell transplantation therapy.">神経幹細胞からドパミン産生神経細胞への分化を制御する未知のシグナル経路「NeuroPath-α」を発見。この発見により、パーキンソン病患者由来のiPS細胞から高純度かつ機能的なドパミン神経細胞を効率的に分化誘導することが可能となり、細胞移植治療の実現に大きく前進しました。</p>
+                    <p class="publication-impact" data-ja="インパクト: この研究成果は京都大学iPS細胞研究所との共同研究として発展し、パーキンソン病患者への世界初の臨床試験が2024年に開始予定です。また、アルツハイマー病やALSなど他の神経変性疾患への応用研究も進行中です。" data-en="Impact: This research has developed into collaborative research with Kyoto University's CiRA, with the world's first clinical trial for Parkinson's disease patients scheduled to begin in 2024. Application research to other neurodegenerative diseases such as Alzheimer's disease and ALS is also ongoing.">インパクト: この研究成果は京都大学iPS細胞研究所との共同研究として発展し、パーキンソン病患者への世界初の臨床試験が2024年に開始予定です。また、アルツハイマー病やALSなど他の神経変性疾患への応用研究も進行中です。</p>
+                </div>
+                <div class="publication-item">
+                    <h3 data-ja="AI駆動型創薬プラットフォーム「DrugGenius」の開発と新規抗がん剤の発見" data-en="Development of AI-driven Drug Discovery Platform 'DrugGenius' and Discovery of Novel Anticancer Agents">AI駆動型創薬プラットフォーム「DrugGenius」の開発と新規抗がん剤の発見</h3>
+                    <p class="publication-journal" data-ja="Science (2023年8月)" data-en="Science (August 2023)">Science (2023年8月)</p>
+                    <p class="publication-description" data-ja="独自開発の機械学習アルゴリズムとマルチオミクス解析を統合した創薬プラットフォーム「DrugGenius」を構築。従来の創薬プロセスを10分の1の時間で完了させ、膵臓がんに対する新規分子標的薬「BG-2023」を発見しました。この化合物は前臨床試験で既存治療薬を上回る効果を示しています。" data-en="Constructed the drug discovery platform 'DrugGenius' that integrates our proprietary machine learning algorithms with multi-omics analysis. Completed conventional drug discovery processes in one-tenth the time and discovered the novel molecular targeted drug 'BG-2023' for pancreatic cancer. This compound has shown superior efficacy to existing treatments in preclinical studies.">独自開発の機械学習アルゴリズムとマルチオミクス解析を統合した創薬プラットフォーム「DrugGenius」を構築。従来の創薬プロセスを10分の1の時間で完了させ、膵臓がんに対する新規分子標的薬「BG-2023」を発見しました。この化合物は前臨床試験で既存治療薬を上回る効果を示しています。</p>
+                    <p class="publication-impact" data-ja="インパクト: 本プラットフォームは世界5大製薬企業との共同研究契約を獲得し、合計150億円の研究資金調達に成功しました。現在、肺がん、乳がん、大腸がんを対象とした新薬開発が並行して進行中で、2025年から順次臨床試験入りが予定されています。" data-en="Impact: This platform has secured joint research contracts with the world's top 5 pharmaceutical companies and successfully raised 15 billion yen in research funding. Currently, new drug development targeting lung, breast, and colorectal cancers is progressing in parallel, with clinical trials scheduled to begin sequentially from 2025.">インパクト: 本プラットフォームは世界5大製薬企業との共同研究契約を獲得し、合計150億円の研究資金調達に成功しました。現在、肺がん、乳がん、大腸がんを対象とした新薬開発が並行して進行中で、2025年から順次臨床試験入りが予定されています。</p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="contact" class="section">
+            <div class="container">
+                <h2 class="section-title" data-ja="アクセス・お問い合わせ" data-en="Access & Contact Information">アクセス・お問い合わせ</h2>
+                <p class="section-subtitle" data-ja="研究に関するご質問、共同研究のご相談、見学のお申し込みなど、お気軽にお問い合わせください。" data-en="Please feel free to contact us regarding research questions, collaboration consultations, tour applications, and more.">研究に関するご質問、共同研究のご相談、見学のお申し込みなど、お気軽にお問い合わせください。</p>
+                <div class="contact-grid">
+                    <div class="contact-card">
+                        <div class="contact-icon">📍</div>
+                        <h3 data-ja="所在地・アクセス" data-en="Location & Access">所在地・アクセス</h3>
+                        <p data-ja="〒100-0001<br>東京都千代田区千代田1-1-1<br>バイオサイエンス総合研究棟 5階<br><br>JR山手線「東京駅」から徒歩8分<br>地下鉄丸ノ内線「大手町駅」から徒歩5分<br>専用駐車場完備（要事前予約）" data-en="1-1-1 Chiyoda, Chiyoda-ku<br>Tokyo 100-0001, Japan<br>Bioscience Research Building 5F<br><br>8 min walk from JR Tokyo Station<br>5 min walk from Otemachi Station<br>Dedicated parking available (reservation required)">〒100-0001<br>東京都千代田区千代田1-1-1<br>バイオサイエンス総合研究棟 5階<br><br>JR山手線「東京駅」から徒歩8分<br>地下鉄丸ノ内線「大手町駅」から徒歩5分<br>専用駐車場完備（要事前予約）</p>
+                    </div>
+                    <div class="contact-card">
+                        <div class="contact-icon">📞</div>
+                        <h3 data-ja="電話・受付時間" data-en="Phone & Office Hours">電話・受付時間</h3>
+                        <p data-ja="代表: 03-1234-5678<br>研究に関するお問い合わせ: 03-1234-5679<br>共同研究・産学連携: 03-1234-5680<br><br>受付時間: 平日 9:00-17:30<br>（祝日・年末年始を除く）<br>緊急時は24時間対応可能" data-en="Main: 03-1234-5678<br>Research inquiries: 03-1234-5679<br>Industry collaboration: 03-1234-5680<br><br>Office hours: Weekdays 9:00-17:30<br>(Excluding holidays and year-end)<br>24/7 emergency support available">代表: 03-1234-5678<br>研究に関するお問い合わせ: 03-1234-5679<br>共同研究・産学連携: 03-1234-5680<br><br>受付時間: 平日 9:00-17:30<br>（祝日・年末年始を除く）<br>緊急時は24時間対応可能</p>
+                    </div>
+                    <div class="contact-card">
+                        <div class="contact-icon">✉️</div>
+                        <h3 data-ja="メール・オンライン" data-en="Email & Online">メール・オンライン</h3>
+                        <p data-ja="一般お問い合わせ:<br>info@biogenesis-lab.jp<br><br>研究・技術相談:<br>research@biogenesis-lab.jp<br><br>報道・メディア関係:<br>press@biogenesis-lab.jp<br><br>オンライン研究室見学も随時開催" data-en="General inquiries:<br>info@biogenesis-lab.jp<br><br>Research consultation:<br>research@biogenesis-lab.jp<br><br>Press & Media:<br>press@biogenesis-lab.jp<br><br>Online lab tours available anytime">一般お問い合わせ:<br>info@biogenesis-lab.jp<br><br>研究・技術相談:<br>research@biogenesis-lab.jp<br><br>報道・メディア関係:<br>press@biogenesis-lab.jp<br><br>オンライン研究室見学も随時開催</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">BioGenesis Lab</div>
+            <p>&copy; 2025 BioGenesis Laboratory. All rights reserved.</p>
+            <p data-ja="生命科学の未来を創造し、人類の幸福に貢献する研究拠点" data-en="A research hub creating the future of life sciences and contributing to human happiness">生命科学の未来を創造し、人類の幸福に貢献する研究拠点</p>
+        </div>
+    </footer>
+    
+    <script>
+        let currentLang = 'ja';
+        
+        function switchLang(lang) {
+            currentLang = lang;
+            
+            // Toggle button states
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[onclick="switchLang('${lang}')"]`).classList.add('active');
+            
+            // Switch content
+            document.querySelectorAll('[data-ja][data-en]').forEach(element => {
+                element.textContent = element.getAttribute(`data-${lang}`);
+            });
+        }
+        
+        function toggleMobileMenu() {
+            const nav = document.getElementById('nav');
+            nav.classList.toggle('active');
+        }
+        
+        function closeMenu() {
+            const nav = document.getElementById('nav');
+            nav.classList.remove('active');
+        }
+        
+        // Smooth scroll behavior for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 100) {
+                header.style.background = 'rgba(248, 250, 252, 0.95)';
+                header.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
+            } else {
+                header.style.background = 'rgba(248, 250, 252, 0.8)';
+                header.style.boxShadow = 'none';
+            }
+        });
+        
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+        
+        // Observe cards for animation
+        document.querySelectorAll('.research-card, .member-card, .publication-item, .contact-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            card.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+            observer.observe(card);
+        });
+        
+        // Add parallax effect to background
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const dnaBackground = document.querySelector('.dna-background');
+            dnaBackground.style.transform = `translateY(${scrolled * 0.1}px)`;
+        });
+    </script>
+</body>
+</html>
