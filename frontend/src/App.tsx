@@ -196,7 +196,7 @@ const HeaderBar: React.FC = () => {
       <div className="container header-inner">
         {/* ▼ モバイルでは文字を出さず、マークのみ表示 */}
         <a href="/" className="brand" aria-label="トップへ">
-          <img src="/headerlogo.png" alt="LabPage" className="brand-logo" />
+          <img src="/logo.png" alt="LabPage" className="brand-logo" />
           <span className="brand-text">LabPage</span>
         </a>
 
