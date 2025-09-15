@@ -159,8 +159,8 @@ const HeaderBar: React.FC = () => {
     <header className="header" role="banner">
       <div className="container header-inner">
         <a href="/" className="brand" aria-label="トップへ">
-          <img src="/headerlogo2.png" alt="Subnet‑flow" className="brand-logo" />
-          <span className="brand-text">Subnet‑flow</span>
+          <img src="/labsocket.png" alt="Subnet‑flow" className="brand-logo" />
+          <span className="brand-text">LabSocket</span>
         </a>
 
         {/* PC/タブレット: 通常ナビ */}
