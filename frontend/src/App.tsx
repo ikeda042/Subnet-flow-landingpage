@@ -1,14 +1,36 @@
 import React from 'react';
 
+// アクセストラッキング用のヘルパー
+function postTracker(name: string) {
+  try {
+    const url = 'https://ikeda042.homes/api/v1/time_tracker';
+    if (typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function') {
+      const data = new Blob([JSON.stringify({ name })], { type: 'application/json' });
+      navigator.sendBeacon(url, data);
+      return;
+    }
+    fetch(url, {
+      method: 'POST',
+      headers: { accept: 'application/json', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name }),
+      keepalive: true,
+    }).catch(() => {});
+  } catch {
+    // 何もしない
+  }
+}
+
 /* =========================
    型定義
 ========================= */
-type Demo = {
+type CaseItem = {
   id: string;
   title: string;
-  description: string;
-  imageUrl: string;
-  demoUrl: string;
+  summary: string;
+  impact: string;
+  price: string;
+  imageDataUrl: string;
+  notes?: string;
 };
 
 type Member = {
@@ -25,79 +47,54 @@ type Member = {
    ユーティリティ（プレースホルダー画像/アバター）
 ========================= */
 /** デモ用の簡易プレースホルダー画像（OGP比率） */
-// const makePlaceholder = (label: string) => {
-//   const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='630' viewBox='0 0 1200 630'>
-//   <defs>
-//     <linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
-//       <stop offset='0' stop-color='#dbeafe'/>
-//       <stop offset='1' stop-color='#fef3c7'/>
-//     </linearGradient>
-//     <linearGradient id='g2' x1='0' y1='1' x2='1' y2='0'>
-//       <stop offset='0' stop-color='#e2e8f0' stop-opacity='.35'/>
-//       <stop offset='1' stop-color='#94a3b8' stop-opacity='.35'/>
-//     </linearGradient>
-//   </defs>
-//   <rect width='1200' height='630' fill='url(#g)'/>
-//   <circle cx='980' cy='-60' r='300' fill='url(#g2)'/>
-//   <circle cx='-40' cy='580' r='220' fill='url(#g2)'/>
-//   <g fill='#0f172a' font-family='system-ui,-apple-system,Segoe UI,Roboto,Noto Sans JP,Arial' text-anchor='middle'>
-//     <text x='600' y='310' font-size='46' font-weight='700'>${label}</text>
-//     <text x='600' y='360' font-size='20' fill='#475569'>Laboratory Demo</text>
-//   </g>
-// </svg>`;
-//   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
-// };
-
+const makePlaceholder = (label: string) => {
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='630' viewBox='0 0 1200 630'>
+  <defs>
+    <linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
+      <stop offset='0' stop-color='#dbeafe'/>
+      <stop offset='1' stop-color='#fef3c7'/>
+    </linearGradient>
+    <linearGradient id='g2' x1='0' y1='1' x2='1' y2='0'>
+      <stop offset='0' stop-color='#e2e8f0' stop-opacity='.35'/>
+      <stop offset='1' stop-color='#94a3b8' stop-opacity='.35'/>
+    </linearGradient>
+  </defs>
+  <rect width='1200' height='630' fill='url(#g)'/>
+  <circle cx='980' cy='-60' r='300' fill='url(#g2)'/>
+  <circle cx='-40' cy='580' r='220' fill='url(#g2)'/>
+  <g fill='#0f172a' font-family='system-ui,-apple-system,Segoe UI,Roboto,Noto Sans JP,Arial' text-anchor='middle'>
+    <text x='600' y='310' font-size='44' font-weight='700'>${label}</text>
+    <text x='600' y='360' font-size='20' fill='#475569'>Subnet‑flow Case</text>
+  </g>
+</svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+};
 
 /* =========================
-   ダミーデータ
+   データ
 ========================= */
-const demoData: Demo[] = [
+const cases: CaseItem[] = [
   {
-    id: 'viz',
-    title: '温和な雰囲気のホームページ例',
-    description: '人文学系の研究室に好まれる柔らかい雰囲気のベースデザインです。。',
-    imageUrl: "/humanity_lab/humanity_lab_top.png",
-    demoUrl: '/humanity_lab/humanity_lab.html'
+    id: 'microscope',
+    title: '顕微鏡画像解析（細胞ラベリング）',
+    summary: '既存の個人PC依存ワークフローをローカルAPI/GUIとして統一。',
+    impact: '約60倍 高速化 / 研究員3人分の作業削減',
+    price: '年額 240万円（広島大学ラボに導入）',
+    imageDataUrl: makePlaceholder('Microscope Labeling'),
+    notes: '資料 p.4, p.14'
   },
   {
-    id: 'dashboard',
-    title: 'シンプルで無駄がないホームページ例',
-    description: '数理生命科学系の研究室に好まれるシンプルなベースデザインです。',
-    imageUrl: "/bio_lab2/bio_lab2_top.png",
-    demoUrl: '/bio_lab2/bio_lab2.html',
-  },
-   {
-    id: 'papers',
-    title: '航空工学系研究室のホームページ例',
-    description: '航空工学や宇宙系の研究室に好まれるベースデザインです。',
-    imageUrl: "/aerospace_lab/aerospace_lab_top.png",
-    demoUrl: '/aerospace_lab/aerospace_lab.html'
-  },
-   {
-    id: 'papers',
-    title: '機械工学系研究室のホームページ例',
-    description: '機械工学系の研究室に好まれる学術的なベースデザインです。',
-    imageUrl: "/maceng_lab/mac_eng_lab_top.png",
-    demoUrl: "/maceng_lab/mac_eng_lab.html"
-  },
-   {
-    id: 'papers',
-    title: 'データサイエンス系研究室のホームページ例',
-    description: 'データサイエンス系の研究室に好まれるモダンかつシンプルなベースデザインです。',
-    imageUrl: "/datascience_lab/datascience_lab_top.png",
-    demoUrl: '/datascience_lab/datascience_lab.html'
-  },
-   {
-    id: 'papers',
-    title: 'モダンなバイオ系研究室のホームページ例',
-    description: 'モダンなバイオ系の研究室に好まれるベースデザインです。',
-    imageUrl: "/bio_lab3/bio_lab3_top.png",
-    demoUrl: '/bio_lab3/bio_lab3.html'
-  },
+    id: 'rubifier',
+    title: '教育学部：ルビ振りローカルAPI化',
+    summary: '本番サーバー負荷を大幅軽減、処理をローカルへ移送。',
+    impact: '高速化&安定運用 / プロダクション負荷を大幅軽減',
+    price: '月額 16.5万円',
+    imageDataUrl: makePlaceholder('Ruby Annotation API'),
+    notes: '資料 p.15'
+  }
 ];
 
-/** 例: メンバー情報（差し替え推奨） */
+/** 例: メンバー情報（差し替え可） */
 const members: Member[] = [
   {
     id: 'm1',
@@ -108,7 +105,6 @@ const members: Member[] = [
     expertise: ['日英通訳', '広大8年目', 'スタートアップCEO'],
     links: [
       { label: '経歴', href: 'https://www.wantedly.com/id/yunosuke_ikeda' },
-      { label: 'CEO', href: 'https://ellipsys.co.jp/' }
     ]
   },
   {
@@ -118,63 +114,20 @@ const members: Member[] = [
     bio: '広島大学大学院で難培養性微生物の研究を行う傍ら、水球部の主将として仲間を率いる。研究とスポーツを通じて培った粘り強さとリーダーシップで、新たな価値を創造していく。',
     avatarUrl: "2.png",
     expertise: ['広大水球部主将', '体力勝負', '難培養性微生物'],
-      links: [
+    links: [
       { label: '所属研究室', href: 'https://aoi-lab.net/' },
     ]
   },
 ];
-
-// /** 例: 活動実績（差し替え推奨） — ※このデータ構造（dateベース）を「参考サイトのカード表示」にマッピングします */
-// const achievementsData: Activity[] = [
-//   {
-//     id: 'a2025-bestpaper',
-//     date: '2025-07-16',
-//     title: '国際会議にてBest Paper (例)',
-//     description: 'UIとアクセシビリティの両立に関する取り組みを発表し、評価を受けました。',
-//     tags: ['award', 'paper'],
-//     link: 'https://example.com/paper-2025'
-//   },
-//   {
-//     id: 'a2025-release',
-//     date: '2025-05-30',
-//     title: '研究室サイトテンプレート v2 を公開',
-//     description: '静的サイト + 大学ドメイン申請支援のテンプレを刷新。高速化とアクセシビリティを強化。',
-//     tags: ['release']
-//   },
-//   {
-//     id: 'a2024-collab',
-//     date: '2024-12-10',
-//     title: '学内プロジェクトでの共同研究サイトを構築',
-//     description: '3研究室の横断プロジェクトの広報サイトを整備し、情報更新のワークフローを標準化。',
-//     tags: ['collab']
-//   },
-//   {
-//     id: 'a2024-media',
-//     date: '2024-09-01',
-//     title: '教育系メディアに事例掲載 (例)',
-//     description: '「学生主体で進める研究室サイト運用」の特集記事に採用。',
-//     tags: ['media'],
-//     link: 'https://example.com/media-2024'
-//   },
-//   {
-//     id: 'a2024-grant',
-//     date: '2024-04-15',
-//     title: '学内助成による情報発信支援を開始',
-//     description: '研究成果公開のデータ整備・OGP最適化の取り組みを拡大。',
-//     tags: ['grant']
-//   }
-// ];
 
 /* =========================
    レイアウト/各セクション
 ========================= */
 /** Header */
 const HeaderBar: React.FC = () => {
-  // ▼ モバイル用メニュー開閉
   const [open, setOpen] = React.useState(false);
   const menuId = 'mobile-menu';
 
-  // 背景スクロール抑止 & Escapeで閉じる
   React.useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setOpen(false);
@@ -187,30 +140,37 @@ const HeaderBar: React.FC = () => {
     };
   }, [open]);
 
-  const closeAndScroll = () => {
-    setOpen(false);
-  };
+  const closeAndScroll = () => setOpen(false);
+
+  const nav = [
+    { href: '#problem', label: '課題' },
+    { href: '#solution', label: '解決策' },
+    { href: '#results', label: '導入効果' },
+    { href: '#flow', label: '導入の流れ' },
+    { href: '#target', label: '対象研究室' },
+    { href: '#pricing', label: '価格' },
+    { href: '#tech', label: '技術体制' },
+    { href: '#faq', label: 'FAQ' },
+    { href: '#team', label: '運営メンバー' },
+    { href: '#contact', label: '問い合わせ' },
+  ];
 
   return (
     <header className="header" role="banner">
       <div className="container header-inner">
-        {/* ▼ モバイルでは文字を出さず、マークのみ表示 */}
         <a href="/" className="brand" aria-label="トップへ">
-          <img src="/logo.png" alt="LabPage" className="brand-logo" />
-          <span className="brand-text">LabPage</span>
+          <img src="/headerlogo2.png" alt="Subnet‑flow" className="brand-logo" />
+          <span className="brand-text">Subnet‑flow</span>
         </a>
 
         {/* PC/タブレット: 通常ナビ */}
         <nav className="nav" aria-label="メインナビゲーション">
-          <a href="#service"><b>サービス</b></a>
-          <a href="#flow"><b>導入フロー</b></a>
-          <a href="#demos"><b>作成例</b></a>
-          <a href="#contact"><b>作成依頼</b></a>
-          <a href="#faq"><b>よくある質問</b></a>
-          <a href="#team"><b>運営メンバー</b></a>
+          {nav.map((n) => (
+            <a key={n.href} href={n.href}><b>{n.label}</b></a>
+          ))}
         </nav>
 
-        {/* スマホ: ハンバーガー（テキスト無し） */}
+        {/* スマホ: ハンバーガー */}
         <button
           type="button"
           className="mobile-menu-btn"
@@ -223,7 +183,7 @@ const HeaderBar: React.FC = () => {
         </button>
       </div>
 
-      {/* スマホ用のフルスクリーンメニュー（大きめのタップ領域） */}
+      {/* モバイル用のフルスクリーンメニュー */}
       <div
         id={menuId}
         className={`mobile-sheet ${open ? 'open' : ''}`}
@@ -232,34 +192,38 @@ const HeaderBar: React.FC = () => {
         aria-label="サイト内メニュー"
       >
         <div className="mobile-sheet-inner container">
-          <a href="#service" onClick={closeAndScroll}>サービス</a>
-          <a href="#flow" onClick={closeAndScroll}>導入フロー</a>
-          <a href="#demos" onClick={closeAndScroll}>作成例</a>
-          <a href="#contact" onClick={closeAndScroll}>作成依頼</a>
-          <a href="#faq" onClick={closeAndScroll}>よくある質問</a>
-          <a href="#team" onClick={closeAndScroll}>運営メンバー</a>
+          {nav.map((n) => (
+            <a key={n.href} href={n.href} onClick={closeAndScroll}>{n.label}</a>
+          ))}
         </div>
       </div>
     </header>
   );
 };
 
-/** Hero（製品の要約） */
+/** Hero（価値訴求＋CTA） */
 const HeroBlock: React.FC = () => {
   return (
     <section className="hero" aria-labelledby="hero-heading">
       <div className="container">
-        <h1 id="hero-heading">研究室ホームページを最短即日公開</h1>
+        <h1 id="hero-heading">研究の「属人化」をなくす。</h1>
         <h4 className="hero-sub">
-          {`LabPageは広島大学出身者が運営するサービスで、母校への貢献活動として無料でサービスを提供しています。
-業務が忙しくホームページに時間を割けないという研究室でもご安心ください。
-LabPageなら、必要な情報を最小限の聞き取りで迅速にサイトを作成し、研究成果やメンバー紹介、学部生へ向けた発信などを安全かつスピーディに発信できます。`}
+          ラボ特化型ローカルAPI <b>「Subnet‑flow」</b> — 研究室内の解析作業をローカルサーバーに
+          <b> API / GUI</b>として展開。誰でもブラウザから同じ解析を即実行できます。
+          <br />
+          <span className="eyebrow" style={{marginTop: 6}}>最短即日で提供。PoCから本展開まで迅速に支援。</span>
         </h4>
+
+        <div className="cta-group" style={{marginTop: 14}}>
+          <a className="btn-primary" href="#contact" aria-label="無料相談へ">無料相談／PoCのご相談</a>
+          <a className="btn-ghost" href="#pricing" aria-label="価格へ">価格を見る</a>
+        </div>
+
         <div className="hero-media">
           <img
             className="hero-img"
             src="toppage3.png"
-            alt="LabPage トップページのプレビュー画像"
+            alt="Subnet‑flow: 研究室の解析をローカルAPI/GUIに展開するイメージ"
             loading="eager"
             decoding="async"
           />
@@ -269,48 +233,102 @@ LabPageなら、必要な情報を最小限の聞き取りで迅速にサイト�
   );
 };
 
-/** 個別デモカード */
-const DemoCard: React.FC<{ demo: Demo }> = ({ demo }) => {
+/** 課題（なぜ必要か） */
+const ProblemSection: React.FC = () => {
   return (
-    <article className="card">
-      <img
-        src={demo.imageUrl}
-        alt={`${demo.title}のプレビュー画像`}
-        loading="lazy"
-        width={1200}
-        height={630}
-      />
-      <div className="card-body">
-        <h3 className="card-title">{demo.title}</h3>
-        <p className="card-desc">{demo.description}</p>
-        <a
-          className="btn"
-          href={demo.demoUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={`${demo.title} のデモを新しいタブで開く`}
-          title="新しいタブで開く"
-        >
-         <b>実際のサイトを見る</b>  <span className="ext" aria-hidden="true">↗</span>
-          <span className="visually-hidden">（新しいタブ）</span>
-        </a>
+    <section id="problem" className="section" aria-labelledby="problem-heading">
+      <div className="container">
+        <h2 id="problem-heading">課題 — なぜ必要か</h2>
+        <p className="section-lead">
+          解析作業が個人や特定PCに紐づき、<b>環境構築が常にボトルネック</b>。その結果、解析が止まり、知見の共有・継承も進みません。
+        </p>
+        <ul className="bullets">
+          <li>「あのPCで、あの人しか回せない」状態から抜け出せない</li>
+          <li>バージョン差異・依存地獄で再現不能、再現性検証に時間がかかる</li>
+          <li>新メンバー着任のたびにセットアップからやり直し</li>
+        </ul>
       </div>
-    </article>
+    </section>
   );
 };
 
-/** デモグリッド（6つのデモへの入口） */
-const DemoGrid: React.FC = () => {
+/** 解決策（Subnet‑flow） */
+const SolutionSection: React.FC = () => {
   return (
-    <section id="demos" className="section" aria-labelledby="demos-heading">
+    <section id="solution" className="promo" aria-labelledby="solution-heading">
+      <div className="container promo-inner">
+        <div className="promo-copy">
+          <span className="eyebrow">解決策</span>
+          <h2 id="solution-heading">Subnet‑flow とは</h2>
+          <p className="lead">
+            ローカルサーバー上に統一の解析環境を構築し、<b>API/GUI</b>として提供。
+            研究室全員が<b>ブラウザから同一解析を即実行</b>でき、成果の共有・継承が容易になります。
+          </p>
+          <ul className="bullets" aria-label="主な特長">
+            <li><b>共通環境：</b>解析モジュールをAPI化し、環境差異を吸収</li>
+            <li><b>ゼロから実行：</b>PC/OSに依らずブラウザだけで利用可</li>
+            <li><b>ネットワーク適合：</b>学内ネットワーク（大学ゾーンC）に合わせて展開、VPNで学外アクセス拡張</li>
+            <li><b>スケール容易：</b>解析パイプラインをテンプレ化し、横展開を加速</li>
+          </ul>
+
+          <div className="kpis" role="list" aria-label="スタチャレKPI">
+            <div className="kpi" role="listitem">
+              <div className="kpi-num">20%+</div>
+              <div className="kpi-label">研究効率 改善目標</div>
+            </div>
+            <div className="kpi" role="listitem">
+              <div className="kpi-num">30+</div>
+              <div className="kpi-label">多様なラボでPoC</div>
+            </div>
+            <div className="kpi" role="listitem">
+              <div className="kpi-num">即日</div>
+              <div className="kpi-label">最短提供</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="promo-visual" aria-label="ソリューションイメージ">
+          <div className="square">
+            <img
+              src={makePlaceholder('Unified Local API / GUI')}
+              alt="統一解析環境（API/GUI）のイメージ"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+/** 導入効果（実績） */
+const ResultsSection: React.FC = () => {
+  return (
+    <section id="results" className="section" aria-labelledby="results-heading">
       <div className="container">
-        <h2 id="demos-heading">作成例</h2>
-        <h4 className="section-lead">
-        下記の作成例をベースに、研究室の特色に合わせたカスタマイズが可能です。(その他のデザインも１から対応可能です。)
-        </h4>
+        <h2 id="results-heading">導入効果（実績）</h2>
+        <p className="section-lead">実際の研究現場で得られた効果の一例です。</p>
         <div className="grid">
-          {demoData.map((demo) => (
-            <DemoCard key={demo.id} demo={demo} />
+          {cases.map((c) => (
+            <article className="card" key={c.id}>
+              <img
+                src={c.imageDataUrl}
+                alt={`${c.title}のイメージ`}
+                loading="lazy"
+                width={1200}
+                height={630}
+              />
+              <div className="card-body">
+                <h3 className="card-title">{c.title}</h3>
+                <p className="card-desc">{c.summary}</p>
+                <ul className="chip-list">
+                  <li className="chip"><b>{c.impact}</b></li>
+                  <li className="chip">{c.price}</li>
+                </ul>
+                {c.notes && <p className="note" style={{marginTop: 6}}>出典：{c.notes}</p>}
+              </div>
+            </article>
           ))}
         </div>
       </div>
@@ -318,55 +336,174 @@ const DemoGrid: React.FC = () => {
   );
 };
 
-/** サービス紹介（右カラム：squareで image1.png を表示） */
-const ServiceIntro: React.FC = () => {
+/** 導入フロー（要点を短く明示） */
+const IntroFlow: React.FC = () => {
   return (
-    <section id="service" className="promo" aria-labelledby="service-heading">
+    <section id="flow" className="flow" aria-labelledby="flow-heading">
+      <div className="container">
+        <h2 id="flow-heading">導入の流れ</h2>
+        <ol className="flow-steps" aria-label="導入手順">
+          <li>
+            <h3>1. 課題ヒアリング／要件定義</h3>
+            <p>現行フローの確認・目標設定（PoC可）</p>
+          </li>
+          <li>
+            <h3>2. 解析モジュールのAPI化</h3>
+            <p>既存スクリプト/モデルをAPI/バッチ化</p>
+          </li>
+          <li>
+            <h3>3. ローカルサーバーに展開</h3>
+            <p>学内ネットワークに適合（ゾーンC）</p>
+          </li>
+          <li>
+            <h3>4. ブラウザUI提供</h3>
+            <p>誰でも同一解析を即実行</p>
+          </li>
+          <li>
+            <h3>5. Slackで改修対応</h3>
+            <p><b>1日以内</b>のバグ/改修対応</p>
+          </li>
+        </ol>
+        <p className="flow-note">必要に応じて大学のゾーンC＋VPNで学外アクセスも可能です。</p>
+      </div>
+    </section>
+  );
+};
+
+/** 対象研究室 */
+const TargetSection: React.FC = () => {
+  return (
+    <section id="target" className="section" aria-labelledby="target-heading">
+      <div className="container">
+        <h2 id="target-heading">対象研究室</h2>
+        <p className="section-lead">
+          技術支援が不足し、スクリプト化や環境構築に悩む<b>非情報系（教育・医・生物）</b>ラボ。
+          特に<b>顕微鏡 × 画像処理</b>タスクで高い効果が見込めます。
+        </p>
+        <ul className="bullets">
+          <li>既存の手元スクリプトをチームで使い回したい</li>
+          <li>学生入れ替えで毎年セットアップ地獄になっている</li>
+          <li>学外からも安全に使いたい（VPN）</li>
+        </ul>
+      </div>
+    </section>
+  );
+};
+
+/** 価格 */
+const PricingSection: React.FC = () => {
+  return (
+    <section id="pricing" className="promo" aria-labelledby="pricing-heading">
       <div className="container promo-inner">
         <div className="promo-copy">
-          <h3 >研究室向けホームページ作成サービス</h3>
-          <h2 id="service-heading">
-            初期費用・管理費用も<span className="free-badge">完全無料</span>。<br />
-            依頼から<span className="price-inline"></span>最短30分で公開可能。
-          </h2>
-          <ul className="bullets" aria-label="主な特長">
-            <li><strong>高速展開：</strong>ベーステンプレート使用の場合は依頼から最短30分で公開可能</li>
-            <li><strong>更新対応：</strong>情報の更新依頼はメールで対応受付</li>
-            <li><strong>安心運用：</strong>広島大学の学生/出身者が運営</li>
-            <li><strong>完全無料：</strong>固定ドメインを使用する場合は料金発生箇所がゼロ</li>
-            <li><strong>拡張可能：</strong>論文一覧・メンバー・ニュース・イベントなど柔軟に導入可能</li>
-            <li><strong>大学ドメインを使用可能：</strong>ac.jpドメインでホームページを公開可能<sup>*1</sup></li>
+          <span className="eyebrow">価格</span>
+          <h2 id="pricing-heading">10万円／月／研究室</h2>
+          <p className="lead">
+            ローカルサーバー用PCの準備・要件定義・現地セットアップまで含む月額プラン。
+            <b>Slackで1日以内のバグ/改修対応</b>を約束します。
+          </p>
+          <ul className="bullets">
+            <li>含まれるもの：機材セットアップ／API・UI実装／運用サポート</li>
+            <li>価格根拠：研究作業員の時給・月給相場、既存クラウド費（8–11万円/月）等を勘案</li>
+            <li>大学の経費手続き簡素化のため、<b>分割（月額）</b>を採用</li>
           </ul>
-          
-          <div className="kpis" role="list" aria-label="ポイント">
+
+          <div className="kpis" role="list" aria-label="コスト例">
             <div className="kpi" role="listitem">
-              <div className="kpi-num">0円</div>
-              <div className="kpi-label">初期/管理コスト</div>
+              <div className="kpi-num">¥25,000</div>
+              <div className="kpi-label">Beelink EQ13（実コスト例）</div>
             </div>
             <div className="kpi" role="listitem">
-              <div className="kpi-num">0円/回</div>
-              <div className="kpi-label">データ更新費用</div>
+              <div className="kpi-num">¥12,000/月</div>
+              <div className="kpi-label">同等クラウド相当</div>
             </div>
             <div className="kpi" role="listitem">
-              <div className="kpi-num">0円<sup>*1</sup></div>
-              <div className="kpi-label">ホスティング</div>
+              <div className="kpi-num">2年</div>
+              <div className="kpi-label">ローカル一括購入の利用想定</div>
             </div>
           </div>
-          <h4 className="note"><sup>*1</sup>大学のドメインを使用する場合、広島大学のホスティングサービスの申請が必要です(300円/月)。</h4>
-          <h4 className="note"><sup>*1</sup>固定ドメインを使用する場合は無料です。</h4>
 
+          <p className="note" style={{marginTop: 8}}>
+            ※ 記載の価格・効果は資料時点の事例・試算です。導入規模や要件により変動します。
+          </p>
         </div>
 
-        {/* ▼ 右カラム：square で image1.png を表示（旧 pricing セクションは削除） */}
-        <div className="promo-visual" aria-label="サービスイメージ">
+        <div className="promo-visual" aria-label="価格比較イメージ">
           <div className="square">
             <img
-              src="image2.png"
-              alt="サービスイメージ（image1.png）"
+              src={makePlaceholder('Local server ≪ Cloud')}
+              alt="ローカルとクラウドのコスト・運用比較のイメージ"
               loading="lazy"
               decoding="async"
             />
           </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+/** 技術体制（AI従業員） */
+const TechSection: React.FC = () => {
+  return (
+    <section id="tech" className="section" aria-labelledby="tech-heading">
+      <div className="container">
+        <h2 id="tech-heading">技術体制（AI従業員）</h2>
+        <p className="section-lead">
+          OpenAI／Claude／Gemini 等の<b>自律型AIエージェント群</b>を
+          <b>PM — BE — FE</b>で並列連携。最短即日の提供を実現します。
+        </p>
+        <div className="grid">
+          <article className="card">
+            <img src={makePlaceholder('PM Agent')} alt="PM Agent" />
+            <div className="card-body">
+              <h3 className="card-title">PM Agent</h3>
+              <p className="card-desc">要件定義・WBS化・仕様の差分検知でリードタイムを短縮。</p>
+            </div>
+          </article>
+          <article className="card">
+            <img src={makePlaceholder('Backend Agent')} alt="Backend Agent" />
+            <div className="card-body">
+              <h3 className="card-title">Backend Agent</h3>
+              <p className="card-desc">API化・バッチ化・モデル推論の最適実装を担当。</p>
+            </div>
+          </article>
+          <article className="card">
+            <img src={makePlaceholder('Frontend Agent')} alt="Frontend Agent" />
+            <div className="card-body">
+              <h3 className="card-title">Frontend Agent</h3>
+              <p className="card-desc">ブラウザUIを迅速に構築。アクセシビリティも考慮。</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+/** FAQ（Subnet‑flow版） */
+const FAQ: React.FC = () => {
+  return (
+    <section id="faq" className="faq-section" aria-labelledby="faq-heading">
+      <div className="container">
+        <h2 id="faq-heading">よくある質問</h2>
+        <div className="faq-list">
+          <details>
+            <summary>Q. 学外から使えますか？</summary>
+            <p>A. 大学ネットワークのゾーンCにVPNを張る構成で、学外からの安全なアクセス拡張が可能です。</p>
+          </details>
+          <details>
+            <summary>Q. クラウドと比べてどうですか？</summary>
+            <p>A. 同等スペックならローカルの方が安価で、初期設定や維持も簡単です。研究データを学内から出さずに運用できます。</p>
+          </details>
+          <details>
+            <summary>Q. どんな研究室に向いていますか？</summary>
+            <p>A. 非情報系分野、特に顕微鏡×画像処理など属人化しやすいタスクに適します。</p>
+          </details>
+          <details>
+            <summary>Q. どれくらい効率化しますか？</summary>
+            <p>A. 事例では約60倍の高速化もありますが、まずはPoCで適切な目標（例：研究効率20%以上）を設定して検証します。</p>
+          </details>
         </div>
       </div>
     </section>
@@ -407,6 +544,15 @@ const MemberCard: React.FC<{ member: Member }> = ({ member }) => {
                 rel="noopener noreferrer"
                 title={`${l.label} を新しいタブで開く`}
                 aria-label={`${member.name}の${l.label}を新しいタブで開く`}
+                onClick={() => {
+                  if (member.name.includes('池田') && l.label === '経歴') {
+                    postTracker('ikeda');
+                  } else if (member.name.includes('林') && l.label === '所属研究室') {
+                    postTracker('hayashi');
+                  } else if (member.name.includes('鶴迫') && l.label === 'ポートフォリオ') {
+                    postTracker('tsurusako');
+                  }
+                }}
               >
                 {l.label} <span className="ext" aria-hidden="true">↗</span>
                 <span className="visually-hidden">（新しいタブ）</span>
@@ -423,9 +569,9 @@ const TeamSection: React.FC = () => {
   return (
     <section id="team" className="section team" aria-labelledby="team-heading">
       <div className="container">
-        <h2 id="team-heading">メンバー紹介</h2>
+        <h2 id="team-heading">運営メンバー</h2>
         <p className="section-lead">
-          LabPageの構築・運用を支えるチームです。
+          Subnet‑flowの構築・運用を支えるチームです。
         </p>
         <div className="member-grid" role="list" aria-label="メンバー一覧">
           {members.map((m) => (
@@ -439,127 +585,22 @@ const TeamSection: React.FC = () => {
   );
 };
 
-/* ==========================================================
-   活動実績（カードグリッド版）
-========================================================== */
-// const yearFromDate = (iso: string) => {
-//   const d = new Date(iso);
-//   return Number.isNaN(d.getTime()) ? '' : String(d.getFullYear());
-// };
-
-// const AchievementsSection: React.FC = () => {
-//   // 新しい順に並べ替え（date の降順）
-//   const data = [...achievementsData].sort((a, b) => (a.date < b.date ? 1 : -1));
-
-//   return (
-//     <section id="achievements" className="section achievements" aria-labelledby="achievements-heading">
-//       <div className="container">
-//         <h2 id="achievements-heading">活動実績</h2>
-//         <p className="section-lead">
-//           受賞、共同研究、OSS、メディア掲載など、チームの主な実績をご紹介します。
-//         </p>
-
-//         <div className="achv-grid">
-//           {data.map((item) => {
-//             const year = yearFromDate(item.date);
-//             // サムネイルがない場合はタイトルでプレースホルダー生成
-//             const thumb = makePlaceholder(item.title);
-//             return (
-//               <article className="achv-card" key={item.id}>
-//                 <img
-//                   className="achv-thumb"
-//                   src={thumb}
-//                   alt={`${item.title}のイメージ`}
-//                   width={800}
-//                   height={420}
-//                   loading="lazy"
-//                 />
-//                 <div className="achv-body">
-//                   {year && <div className="achv-year" aria-label="年度">{year}</div>}
-//                   <h3 className="achv-title">{item.title}</h3>
-//                   {item.description && <p className="achv-desc">{item.description}</p>}
-//                   {(item.tags?.length ?? 0) > 0 && (
-//                     <ul className="chip-list" aria-label="タグ">
-//                       {item.tags!.map((t) => (
-//                         <li key={t} className="chip">{t}</li>
-//                       ))}
-//                     </ul>
-//                   )}
-//                   {item.link && (
-//                     <a
-//                       className="btn btn-sm"
-//                       href={item.link}
-//                       target="_blank"
-//                       rel="noopener noreferrer"
-//                       aria-label={`${item.title} の詳細を新しいタブで開く`}
-//                       title="新しいタブで開く"
-//                     >
-//                       詳細を見る <span className="ext" aria-hidden="true">↗</span>
-//                       <span className="visually-hidden">（新しいタブ）</span>
-//                     </a>
-//                   )}
-//                 </div>
-//               </article>
-//             );
-//           })}
-//         </div>
-//       </div>
-//     </section>
-//   );
-// };
-
-/** 導入フロー（要点を短く明示） */
-const IntroFlow: React.FC = () => {
-  return (
-    <section id="flow" className="flow" aria-labelledby="flow-heading">
-      <div className="container">
-        <h2 id="flow-heading">導入フロー</h2>
-        <ol className="flow-steps" aria-label="導入手順">
-          <li>
-            <h3>1. 無料相談</h3>
-            <p>要件のヒアリング(メール)</p>
-          </li>
-          <li>
-            <h3>2. 情報提供</h3>
-            <p>ロゴ/研究内容/メンバー/論文等をご共有</p>
-          </li>
-          <li>
-            <h3>3. ドメイン取得サポート</h3>
-            <p>広大公式ドメイン取得のサポート</p>
-          </li>
-          <li>
-            <h3>4. 公開</h3>
-            <p>ヒアリング結果をもとに最短即日公開</p>
-          </li>
-          <li>
-            <h3>5. 運用（無料）</h3>
-            <p>日常の運用コストは0円<sup>*2</sup></p>
-          </li>
-          <li>
-            <h3>6. 更新（無料）</h3>
-            <p>ニュース/メンバー/論文の追加・修正</p>
-          </li>
-        </ol>
-        <p className="flow-note"><sup>*2</sup>広島大学公式のホスティングサービス利用料（300円/月）のみかかります。固定ドメインの場合は、無料で対応可能です。</p>
-      </div>
-    </section>
-  );
-};
-
-/** 依頼および連絡先（導入フローの下に追加） */
+/** 連絡先（CTA） */
 const ContactSection: React.FC = () => {
   const email = 'm242128@hiroshima-u.ac.jp';
-  const subject = '【広島大学】研究室ホームページ作成の相談に関して';
-  const bodyStart = `LabPage担当者様、広島大学の＿＿（お名前）です。
-研究室ホームページの作成について、相談を希望します。
+  const subject = '【Subnet‑flow】PoC/導入のご相談';
+  const bodyStart = `Subnet‑flow 担当者様
+
+広島大学の＿＿（お名前）です。研究室の解析業務に関するPoC/導入について相談を希望します。
 以下、簡単な概要と希望事項です。
 
 ・研究室名：
-・公開希望時期：
-・既存サイトの有無：
-・掲載したい主な内容:
+・解析タスクの概要：
+・既存スクリプト/環境の有無：
+・学外アクセスの要否（VPN）：
+・希望時期／KPI（例：研究効率20%以上）：
 
-ご確認よろしくお願いします。`;
+ご確認よろしくお願いいたします。`;
 
   const [copiedKey, setCopiedKey] = React.useState<null | 'email' | 'subject' | 'body'>(null);
 
@@ -569,7 +610,6 @@ const ContactSection: React.FC = () => {
       setCopiedKey(key);
       window.setTimeout(() => setCopiedKey(null), 1600);
     } catch {
-      // フォールバック
       const ta = document.createElement('textarea');
       ta.value = text;
       ta.style.position = 'fixed';
@@ -587,12 +627,10 @@ const ContactSection: React.FC = () => {
     }
   };
 
-  // ▼ 追加: 本文 textarea を内容に合わせて自動リサイズ
   const bodyRef = React.useRef<HTMLTextAreaElement | null>(null);
   React.useEffect(() => {
     const el = bodyRef.current;
     if (!el) return;
-    // 初期描画後に高さを内容にフィット
     el.style.height = '0px';
     el.style.height = `${el.scrollHeight}px`;
   }, []);
@@ -600,10 +638,10 @@ const ContactSection: React.FC = () => {
   return (
     <section id="contact" className="section contact-section" aria-labelledby="contact-heading">
       <div className="container">
-        <h2 id="contact-heading">依頼および連絡先</h2>
+        <h2 id="contact-heading">お問い合わせ / PoCのご相談</h2>
         <h4 className="section-lead">下記メールアドレス宛にご連絡ください。ワンクリックでコピーできます。</h4>
 
-        {/* メールアドレス行 */}
+        {/* メールアドレス */}
         <div className="copy-row">
           <div className="copy-col">
             <div className="copy-label">メールアドレス</div>
@@ -620,9 +658,9 @@ const ContactSection: React.FC = () => {
           </div>
         </div>
 
-        <h4 className="copy-helper">メール送信の手間を減らすため件名と文の書き始めをコピーしてご活用ください。</h4>
+        <h4 className="copy-helper">件名と本文の書き始めテンプレもご活用ください。</h4>
 
-        {/* 件名テンプレ */}
+        {/* 件名 */}
         <div className="copy-row">
           <div className="copy-col">
             <div className="copy-label">件名（例）</div>
@@ -646,7 +684,7 @@ const ContactSection: React.FC = () => {
           </div>
         </div>
 
-        {/* 本文書き始めテンプレ */}
+        {/* 本文 */}
         <div className="copy-row">
           <div className="copy-col">
             <div className="copy-label">本文書き始め（例）</div>
@@ -669,79 +707,10 @@ const ContactSection: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>
-    </section>
-  );
-};
 
-/** FAQ（簡易） */
-const FAQ: React.FC = () => {
-  return (
-    <section id="faq" className="faq-section" aria-labelledby="faq-heading">
-      <div className="container">
-        <h2 id="faq-heading">よくある質問</h2>
-        <div className="faq-list">
-          <details>
-            <summary>Q: なぜ無料なのですか? </summary>
-            <p>A: 広島大学工学部出身者が主催しており、母校への貢献活動の一環として行っています。さらに、ホームページ作成に数十万円という法外な値段を請求している会社が多く、そのような状況を変える必要があると思ったからです。</p>
-          </details>
-          <details>
-            <summary>Q: サーバーなども用意する必要がありませんか？</summary>
-            <p>A: こちらでPaaSを基盤にした展開インフラを構築しているため不要です。CDN経由でサイトを最速で配信できます。</p>
-          </details>
-          <details>
-            <summary>Q: 繁忙期で公開が遅れることはありますか？</summary>
-            <p>A: 学会発表前や実験データが足りない場合は実験している可能性があります。その場合でも最も遅くとも１週間以内には対応可能です。</p>
-          </details>
-          <details>
-            <summary>Q: 更新依頼はどのように行えば良いですか？</summary>
-            <p>A: メールで情報をいただければ、最短30分以内に更新します。少なくとも数日以内には更新できます。</p>
-          </details>
-          <details>
-            <summary>Q: 更新回数に制限はありますか？</summary>
-            <p>A: 制限はありません。研究成果やメンバー紹介など、必要に応じてご依頼ください。</p>
-          </details>
-          <details>
-            <summary>Q: 本当に無料で使えるのですか？</summary>
-            <p>A: 初期費用・管理費用から開発費用まですべて無料です。大学公式ドメインで公開する場合は、利用時のホスティング費用（300円/月）がかかりますが、本サービスについては料金は一切徴収いたしません。</p>
-          </details>
-          <details>
-            <summary>Q: 大学ドメインを使わない場合はどうしますか？</summary>
-            <p>A: こちらで固定ドメインを用意し、<b>任意の名前.labpage.info</b>というサイトURLになります。(この場合ドメインは無料です。)</p>
-          </details>
-          <details>
-            <summary>Q: サイトのセキュリティ対策はどうなっていますか？</summary>
-            <p>A: SSL証明書を導入し、HTTPSで暗号化通信を行います。大学公式ドメインでのホスティングや独自ドメインにも対応可能です。</p>
-          </details>
-          <details>
-            <summary>Q: 既存サイトから移行できますか？</summary>
-            <p>A: 現行サイトを確認のうえ、情報設計を整理して静的サイトへ移行します。リダイレクト設計も対応可能です（こちらも無料です）。ただし、wordpressなどを使われている場合は、移行できない可能性があります。</p>
-          </details>
-          <details>
-            <summary>Q: ベーステンプレート以外の任意のデザインも作成可能ですか？</summary>
-            <p>A: はい。仕様をメールでお聞きして、数回のやり取りでご希望のデザインのページを公開します。</p>
-          </details>
-          <details>
-            <summary>Q: カスタムフォームなどを掲載した動的サイトも可能ですか？</summary>
-            <p>A: 基本的には静的サイトがやりやすいですが、どうしてもの場合は相談ください。</p>
-          </details>
-          <details>
-            <summary>Q: 公開までどれくらい時間がかかりますか？</summary>
-            <p>A: 必要な情報が揃えば依頼から最短30分以内に公開できます。遅くとも数日以内に対応可能なため、新学期や研究室配属時期直前にも研究室PRにご活用いただけます。。</p>
-          </details>
-          <details>
-            <summary>Q: いつまで更新対応などできますか？</summary>
-            <p>A: 代表池田は本学の博士課程に進む予定のため、少なくとも向こう４年はサポート可能です。その後も、引き継ぎなど誠意を持って行います。</p>
-          </details>
-          <details>
-            <summary>Q: 学会やイベント専用など複数サイトの作成も依頼できますか？</summary>
-            <p>A: 可能です。その場合は詳しい仕様などをご相談ください。</p>
-          </details>
-          <details>
-            <summary>Q: オンライン完結で行えますか?</summary>
-            <p>A: はい、メールのやり取りで全て完結できます。必要に応じてZoomなどを通して詳しいお話をお聞きすることも可能です。</p>
-          </details>
-        </div>
+        <p className="note" style={{marginTop: 10}}>
+          ※ 記載の価格・効果は資料時点の事例・試算です。導入規模や要件により変動します。
+        </p>
       </div>
     </section>
   );
@@ -753,19 +722,19 @@ const FooterBar: React.FC = () => {
   return (
     <footer className="footer" role="contentinfo">
       <div className="container">
-        <p>© {year} LabPage. All Rights Reserved.</p>
+        <p>© {year} Subnet‑flow. All Rights Reserved.</p>
       </div>
     </footer>
   );
 };
 
-/** 追従フッターCTA（常時表示のお問い合わせボタン） */
+/** 追従フッターCTA */
 const StickyFooterCTA: React.FC = () => {
   return (
     <div className="sticky-cta" role="region" aria-label="お問い合わせ">
       <div className="container inner">
-        <a href="#contact" className="sticky-btn" aria-label="お問い合わせ（作成依頼）へ移動">
-          お問い合わせ（作成依頼）
+        <a href="#contact" className="sticky-btn" aria-label="お問い合わせ（PoCのご相談）へ移動">
+          無料相談／PoCのご相談
         </a>
       </div>
     </div>
@@ -778,7 +747,7 @@ const StickyFooterCTA: React.FC = () => {
 const App: React.FC = () => {
   return (
     <>
-      {/* インラインCSS（スマホ時はヘッダーの文字を非表示＆ハンバーガーに） */}
+      {/* インラインCSS */}
       <style>{`
         :root {
           --bg: #f9fafb;
@@ -796,26 +765,21 @@ const App: React.FC = () => {
           --shadow-1: 0 4px 16px rgba(15, 23, 42, 0.04);
           --shadow-2: 0 8px 24px rgba(15, 23, 42, 0.08);
 
-          /* 追従フッターの高さ（約半分に） */
           --stickybar-h: 32px;
-
-          /* ヘッダー高さ（スマホではさらに低く） */
           --header-h: 64px;
 
-          /* 可変サイズ */
           --brand-fz: 22px;
           --nav-fz: 16px;
 
           color-scheme: light;
         }
 
-        /* 狭い画面の最適化：ヘッダーは低く、文字は非表示に */
         @media (max-width: 760px) {
           :root {
-            --header-h: 56px;    /* 以前より低くしてコンテンツを広く */
-            --brand-fz: 16px;    /* モバイルでもブランドテキストを表示 */
+            --header-h: 56px;
+            --brand-fz: 16px;
             --nav-fz: 15px;
-            --stickybar-h: 28px; /* モバイルの追従フッター高さ（約半分に） */
+            --stickybar-h: 28px;
           }
         }
 
@@ -824,18 +788,15 @@ const App: React.FC = () => {
         html {
           scroll-behavior: smooth;
           scroll-padding-top: var(--header-h);
-          /* Hero背景と同じグラデーションを適用し、オーバースクロール時に背景の断切れが見えないようにする */
           background:
             radial-gradient(1400px 600px at 50% -220px, #ede9fe 0, transparent 70%),
             linear-gradient(#ffffff, var(--bg) 70%);
         }
-        /* 初期表示をやや大きめに（デスクトップ想定） */
         @media (min-width: 960px) {
           html { zoom: 1.5; }
         }
         body {
           margin: 0;
-          /* html に適用した Hero と同じグラデーションを透過で見せる */
           background: transparent;
           color: var(--text);
           line-height: 1.6;
@@ -845,7 +806,7 @@ const App: React.FC = () => {
             "Hiragino Kaku Gothic ProN", "ヒラギノ角ゴ ProN W3", "Yu Gothic", "メイリオ", Arial, sans-serif;
           padding-bottom: calc(var(--stickybar-h) + env(safe-area-inset-bottom, 0px));
         }
-        main { padding-top: var(--header-h); } /* 固定ヘッダー分の余白 */
+        main { padding-top: var(--header-h); }
         a { color: var(--primary); text-decoration: none; }
         a:hover { opacity: 0.92; }
         a:focus-visible, button:focus-visible, summary:focus-visible {
@@ -862,7 +823,6 @@ const App: React.FC = () => {
           top: 0; left: 0; right: 0;
           background: color-mix(in oklab, white 0%, transparent);
           backdrop-filter: saturate(180%) blur(6px);
-          border-bottom: 1px solid var(--border);
           z-index: 100;
         }
         .header-inner {
@@ -871,24 +831,15 @@ const App: React.FC = () => {
           min-height: var(--header-h);
         }
 
-        /* ブランドロゴ */
-        .brand {
-          display: inline-flex;
-          align-items: center;
-        }
-        .brand-logo { height: 40px; }
-        .brand-text {
-          margin-left: 8px;
-          font-size: var(--brand-fz);
-          color: #000;
-          font-weight: 600;
-        }
+        .brand { display: inline-flex; align-items: center; }
+        .brand-logo { height: 50px; }
+        .brand-text { margin-left: 8px; font-size: var(--brand-fz); color: #000; font-weight: 600; }
         @media (max-width: 760px) {
           .brand-logo { height: 32px; }
           .brand-text { display: inline; }
         }
 
-        /* デスクトップ用ナビ（スマホでは非表示） */
+        /* デスクトップ用ナビ */
         .nav {
           margin-left: auto; display: flex; gap: 14px; row-gap: 6px; flex-wrap: wrap;
         }
@@ -900,14 +851,12 @@ const App: React.FC = () => {
           border-radius: 8px;
         }
         .nav a:hover { color: var(--text); }
-        @media (max-width: 760px) {
-          .nav { display: none; }                 /* ← スマホではヘッダーのナビ文字を隠す */
-        }
+        @media (max-width: 760px) { .nav { display: none; } }
 
-        /* モバイルメニューボタン（アイコンのみ） */
+        /* モバイルメニューボタン（表示を有効化） */
         .mobile-menu-btn {
           margin-left: auto;
-          display: none; /* レスポンシブでも表示しない */
+          display: none;
           border: 1px solid var(--border);
           background: #fff;
           border-radius: 10px;
@@ -916,7 +865,7 @@ const App: React.FC = () => {
           box-shadow: var(--shadow-1);
         }
         @media (max-width: 760px) {
-          .mobile-menu-btn { display: none; }
+          .mobile-menu-btn { display: inline-flex; align-items: center; justify-content: center; }
         }
         .icon-burger, .icon-burger::before, .icon-burger::after {
           display: block;
@@ -971,12 +920,16 @@ const App: React.FC = () => {
         /* Hero */
         .hero {
           padding: 72px 0 56px;
-          /* ルート(html)に敷いたグラデーションを透過して見せ、連続性を担保 */
           background: transparent;
           border-bottom: 1px solid var(--border);
         }
         .hero h1 { font-size: clamp(28px, 4vw, 40px); margin: 0 0 12px; letter-spacing: .02em; }
         .hero-sub { max-width: 840px; margin: 0; color: var(--muted); font-size: 16px; white-space: pre-line; }
+        .eyebrow {
+          display: inline-flex; align-items: center; gap: 8px;
+          font-size: 12px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase;
+        }
+        .eyebrow::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
         .hero-media { margin-top: 16px; }
         .hero-img {
           display: block;
@@ -986,7 +939,6 @@ const App: React.FC = () => {
           border: 1px solid var(--border);
           box-shadow: var(--shadow-1);
           background: #f5f3ff;
-          filter: blur(0px); 
         }
 
         /* Section & Grid */
@@ -1030,22 +982,7 @@ const App: React.FC = () => {
         .btn-sm { font-size: 13px; padding: 6px 10px; border-radius: 8px; }
         .ext { font-size: 1.05em; line-height: 1; }
 
-        /* より強調したデモ閲覧ボタン（カード内のみ適用） */
-        .card .btn {
-          border-width: 2px;
-          border-color: #0f172a; /* 黒に近い濃い文字色 */
-          color: #0f172a;        /* テキストを黒系に */
-          font-weight: 700;      /* 視認性アップ */
-          padding: 10px 14px;    /* やや大きめに */
-        }
-        .card .btn:hover {
-          background: #f3f4f6;   /* 薄いグレーのホバー */
-          border-color: #0f172a;
-          color: #0b1220;        /* さらにわずかに濃く */
-        }
-
-        /* CTA */
-        .cta-group { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 12px; }
+        /* 強調ボタン */
         .btn-primary, .btn-ghost {
           display: inline-flex; align-items: center; gap: 8px; font-size: 14px; padding: 10px 14px;
           border-radius: 10px; text-decoration: none; transition: background .2s, border-color .2s, color .2s, transform .1s;
@@ -1057,7 +994,7 @@ const App: React.FC = () => {
         .btn-ghost:hover { border-color: var(--primary); background: #f5f3ff; }
         .btn-ghost:active { transform: translateY(1px); }
 
-        /* Promo (サービス紹介) */
+        /* Promo (広いセクション) */
         .promo {
           padding: 56px 0;
           background:
@@ -1068,34 +1005,22 @@ const App: React.FC = () => {
         }
         .promo-inner { display: grid; grid-template-columns: 1fr; gap: 24px; }
         @media (min-width: 960px) { .promo-inner { grid-template-columns: 1.2fr .8fr; } }
-        .eyebrow {
-          display: inline-flex; align-items: center; gap: 8px;
-          font-size: 12px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase;
-        }
-        .eyebrow::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
-        .promo h2 { margin: 8px 0 10px; font-size: clamp(22px, 3.6vw, 30px); letter-spacing: .02em; }
         .free-badge {
           display: inline-block; margin-left: 6px; padding: 2px 8px; font-size: .9em;
           border-radius: 999px; border: 1px solid #e9d5ff; background: #f5f3ff; color: var(--text);
         }
-        .price-inline { font-weight: 800; }
         .lead { color: var(--muted); margin: 0 0 12px; max-width: 720px; }
         .bullets { margin: 12px 0 8px; padding-left: 18px; }
         .bullets li { margin: 6px 0; }
         .note { color: var(--muted); font-size: 12px; margin: 6px 0 16px; }
 
-        .kpis { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; max-width: 640px; }
+        .kpis { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; max-width: 680px; }
         @media (max-width: 520px) { .kpis { grid-template-columns: 1fr 1fr; } }
         .kpi { border: 1px dashed var(--border); border-radius: 12px; padding: 10px; background: #fff; }
         .kpi-num { font-weight: 800; font-size: 18px; line-height: 1.2; }
         .kpi-label { color: var(--muted); font-size: 12px; }
 
-        /* 右カラムの square 画像 */
-        .promo-visual {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
+        .promo-visual { display: flex; align-items: center; justify-content: center; }
         .square {
           width: 100%;
           max-width: 520px;
@@ -1106,12 +1031,7 @@ const App: React.FC = () => {
           background: #f5f3ff;
           box-shadow: var(--shadow-1);
         }
-        .square img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          display: block;
-        }
+        .square img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
         /* Team */
         .team .section-lead { max-width: 760px; }
@@ -1162,26 +1082,6 @@ const App: React.FC = () => {
           border-radius: 999px; background: #fff; color: var(--muted);
         }
 
-        /* Achievements（カードグリッドUI） */
-        .achievements .section-lead { max-width: 760px; }
-        .achv-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
-        @media (min-width: 720px) { .achv-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (min-width: 1120px) { .achv-grid { grid-template-columns: repeat(3, 1fr); } }
-        .achv-card {
-          background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
-          overflow: hidden; box-shadow: var(--shadow-1); display: flex; flex-direction: column;
-          transition: transform .2s ease, box-shadow .2s ease;
-        }
-        .achv-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-2); }
-        .achv-thumb { width: 100%; height: 140px; object-fit: cover; background: #eef2f7; }
-        .achv-body { padding: 12px; display: flex; flex-direction: column; gap: 8px; }
-        .achv-year {
-          display: inline-flex; align-self: flex-start; padding: 2px 8px; font-size: 12px;
-          border: 1px solid var(--border); border-radius: 999px; background: #fff; color: var(--muted);
-        }
-        .achv-title { margin: 0; font-size: 16px; letter-spacing: .01em; }
-        .achv-desc { margin: 0; color: var(--muted); font-size: 13px; }
-
         /* Flow */
         .flow { padding: 36px 0 44px; }
         .flow h2 { margin: 0 0 12px; font-size: 22px; }
@@ -1213,32 +1113,35 @@ const App: React.FC = () => {
         .contact-section .copy-field {
           display: flex;
           gap: 10px;
-          align-items: center; /* 垂直中央で整列（単一行の行に最適） */
+          align-items: center;
           flex-wrap: wrap;
         }
         .contact-section .copy-field > * { align-self: center; }
-        /* テキストエリアを含む行は上揃えにして自然に */
-        .contact-section .copy-field:has(textarea) {
-          align-items: flex-start;
-        }
+        .contact-section .copy-field:has(textarea) { align-items: flex-start; }
         .contact-section .copy-field:has(textarea) > * { align-self: flex-start; }
-        /* テキストエリアは幅を保ちつつ高さに合わせる */
-        .contact-section .copy-area {
-          align-self: stretch;
-        }
-        /* 高さを統一して縦位置ズレを解消 */
+        .contact-section .copy-area { align-self: stretch; }
         .contact-section .copy-btn {
           height: 40px;
-          padding: 0 12px; /* 高さ固定時は上下パディングを0に */
+          padding: 0 14px;
           display: inline-flex;
           align-items: center;
           line-height: 1;
-          font-size: 14px; /* 入力やコードと揃える */
-          margin-top: -2px; /* 最終1-2pxのズレを吸収 */
+          font-size: 14px;
+          margin-top: -2px;
+          border-width: 2px;
+          border-color: #0f172a;
+          color: #0f172a;
+          font-weight: 700;
+          background: #fff;
+        }
+        .contact-section .copy-btn:hover {
+          background: #f3f4f6;
+          border-color: #0f172a;
+          color: #0b1220;
         }
         .contact-section input.copy-input {
           height: 40px;
-          line-height: normal; /* ブラウザ標準に合わせて中央に */
+          line-height: normal;
           font-size: 14px;
         }
         .contact-section .email-code {
@@ -1263,15 +1166,8 @@ const App: React.FC = () => {
           background: #fff;
           color: var(--text);
         }
-        .contact-section .copy-area {
-          overflow: hidden;
-          resize: vertical;
-        }
-        .contact-section .copy-btn {
-          flex: 0 0 auto;
-          min-width: 92px;
-          white-space: nowrap;
-        }
+        .contact-section .copy-area { overflow: hidden; resize: vertical; }
+        .contact-section .copy-btn { flex: 0 0 auto; min-width: 92px; white-space: nowrap; }
         .contact-section .copy-helper { margin: 10px 0; color: var(--muted); font-size: 13px; }
 
         /* FAQ */
@@ -1284,9 +1180,6 @@ const App: React.FC = () => {
         .faq-list summary { cursor: pointer; font-weight: 600; }
         .faq-list p { margin: 8px 0 0; color: var(--muted); }
 
-        /* セクション到達時のアンカーずれ対策 */
-        .section, .promo, .flow, .faq-section { scroll-margin-top: calc(var(--header-h) + 10px); }
-
         /* Footer */
         .footer { border-top: 1px solid var(--border); padding: 28px 0; color: var(--muted); font-size: 13px; background: #fff; }
 
@@ -1295,9 +1188,8 @@ const App: React.FC = () => {
           position: fixed; left: 0; right: 0; bottom: 0;
           min-height: var(--stickybar-h);
           background: #ffffff99; 
-          backdrop-filter:  blur(6px);
+          backdrop-filter: blur(6px);
           border-top: 1px solid var(--border);
-          /* バーの高さを抑えるため上下パディングも縮小 */
           padding: 5px max(16px, env(safe-area-inset-left, 0px)) calc(5px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-right, 0px));
           z-index: 90;
         }
@@ -1307,7 +1199,6 @@ const App: React.FC = () => {
           background: var(--primary);
           color: #fff;
           border: 1px solid var(--primary);
-          /* ボタンサイズも約半分に */
           padding: 6px 10px;
           border-radius: 999px;
           font-weight: 700;
@@ -1317,23 +1208,23 @@ const App: React.FC = () => {
         .sticky-btn:hover { filter: brightness(0.95); text-decoration: none; }
         .sticky-btn:active { transform: translateY(1px); }
 
-        /* Utility */
-        .chip-list { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
-        .visually-hidden {
-          position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
-          overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
-        }
+        /* セクション到達時のアンカーずれ対策 */
+        .section, .promo, .flow, .faq-section { scroll-margin-top: calc(var(--header-h) + 10px); }
       `}</style>
+
       <HeaderBar />
       <main>
         <HeroBlock />
-        <ServiceIntro />
+        <ProblemSection />
+        <SolutionSection />
+        <ResultsSection />
         <IntroFlow />
-        <DemoGrid />
-        <ContactSection />
+        <TargetSection />
+        <PricingSection />
+        <TechSection />
         <FAQ />
         <TeamSection />
-        {/* <AchievementsSection /> */}
+        <ContactSection />
       </main>
       <StickyFooterCTA />
       <FooterBar />
